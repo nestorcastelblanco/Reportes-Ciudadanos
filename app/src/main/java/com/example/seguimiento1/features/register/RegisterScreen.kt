@@ -6,7 +6,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,8 +19,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
-import android.util.Patterns
 import androidx.compose.foundation.text.KeyboardOptions
+import com.example.seguimiento1.core.utils.FieldValidators
 
 @Composable
 fun RegisterScreen(
@@ -52,15 +52,11 @@ fun RegisterScreen(
 
     val nombreError = when {
         nombre.isEmpty() -> "El nombre es obligatorio"
-        nombre.length < 3 -> "Debe tener mínimo 3 caracteres"
+        nombre.length < 3 -> "Debe tener minimo 3 caracteres"
         else -> null
     }
 
-    val emailError = when {
-        email.isEmpty() -> "El correo es obligatorio"
-        !Patterns.EMAIL_ADDRESS.matcher(email).matches() -> "Correo inválido"
-        else -> null
-    }
+    val emailError = FieldValidators.email(email)
 
     val telefonoError = when {
         telefono.isEmpty() -> "El teléfono es obligatorio"
@@ -75,18 +71,8 @@ fun RegisterScreen(
         else -> null
     }
 
-    val passwordError = when {
-        password.isEmpty() -> "La contraseña es obligatoria"
-        password.length < 8 -> "Mínimo 8 caracteres"
-        !password.any { it.isDigit() } -> "Debe contener al menos un número"
-        else -> null
-    }
-
-    val confirmError = when {
-        confirmPassword.isEmpty() -> "Confirma tu contraseña"
-        confirmPassword != password -> "Las contraseñas no coinciden"
-        else -> null
-    }
+    val passwordError = FieldValidators.password(password)
+    val confirmError = FieldValidators.confirmPassword(password, confirmPassword)
 
     Scaffold(
         topBar = {
@@ -99,7 +85,7 @@ fun RegisterScreen(
             ) {
                 IconButton(onClick = { navController.popBackStack() }) {
                     Icon(
-                        imageVector = Icons.Default.ArrowBack,
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = null
                     )
                 }

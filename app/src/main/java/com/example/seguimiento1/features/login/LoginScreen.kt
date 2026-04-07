@@ -1,25 +1,38 @@
 package com.example.seguimiento1.features.login
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
-import com.example.seguimiento1.R
-import android.util.Patterns
+import com.example.seguimiento1.core.navigation.MainRoutes
+import com.example.seguimiento1.core.utils.FieldValidators
+import com.example.seguimiento1.ui.components.AppPrimaryButton
+import com.example.seguimiento1.ui.components.AuthHeader
 
 @Composable
 fun LoginScreen(
     navController: NavHostController,
+    viewModel: LoginViewModel = viewModel()
+) {
+    LoginScreen(
+        navController = navController,
+        onLoginSuccess = {},
+        viewModel = viewModel
+    )
+}
+
+@Composable
+fun LoginScreen(
+    navController: NavHostController,
+    onLoginSuccess: (String) -> Unit,
     viewModel: LoginViewModel = viewModel()
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
@@ -36,20 +49,8 @@ fun LoginScreen(
     // VALIDACIONES
     // =========================
 
-    val isEmailValid = Patterns.EMAIL_ADDRESS.matcher(email).matches()
-    val emailError = when {
-        email.isEmpty() -> "El correo no puede estar vacío"
-        email.length < 6 -> "Debe tener al menos 6 caracteres"
-        !isEmailValid -> "Formato de correo inválido"
-        else -> null
-    }
-
-    val passwordError = when {
-        password.isEmpty() -> "La contraseña no puede estar vacía"
-        password.length < 8 -> "Debe tener mínimo 8 caracteres"
-        !password.any { it.isDigit() } -> "Debe contener al menos un número"
-        else -> null
-    }
+    val emailError = FieldValidators.email(email)
+    val passwordError = FieldValidators.password(password)
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -63,30 +64,7 @@ fun LoginScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            Image(
-                painter = painterResource(id = R.mipmap.ic_launcher_foreground),
-                contentDescription = "Logo",
-                modifier = Modifier.size(200.dp),
-            )
-
-            Text(
-                text = "CIUDAD ALERTA",
-                style = MaterialTheme.typography.headlineMedium,
-                color = MaterialTheme.colorScheme.primary
-            )
-
-            Text(
-                text = "REPORTES CIUDADANOS",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.secondary
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = "Tu comunidad, más segura",
-                style = MaterialTheme.typography.bodySmall
-            )
+            AuthHeader()
 
             Spacer(modifier = Modifier.height(32.dp))
 
@@ -149,7 +127,7 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             TextButton(
-                onClick = { navController.navigate("recover") },
+                onClick = { navController.navigate(MainRoutes.RECOVER_PASSWORD) },
                 modifier = Modifier.align(Alignment.End)
             ) {
                 Text("¿Olvidaste tu contraseña?")
@@ -157,10 +135,8 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
+            AppPrimaryButton(
+                text = "Iniciar Sesion",
                 onClick = {
                     scope.launch {
                         when {
@@ -171,9 +147,7 @@ fun LoginScreen(
                                 snackbarHostState.showSnackbar("Corrige la contraseña")
 
                             viewModel.login() -> {
-                                navController.navigate("home") {
-                                    popUpTo("login") { inclusive = true }
-                                }
+                                onLoginSuccess(email)
                             }
 
                             else ->
@@ -181,13 +155,11 @@ fun LoginScreen(
                         }
                     }
                 }
-            ) {
-                Text("Iniciar Sesión")
-            }
+            )
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            Divider()
+            HorizontalDivider()
 
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -195,14 +167,13 @@ fun LoginScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
+                enabled = false,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.secondary
                 ),
-                onClick = {
-                    navController.navigate("moderator")
-                }
+                onClick = {}
             ) {
-                Text("Ingresar como moderador")
+                Text("Moderador (proximamente)")
             }
 
             Spacer(modifier = Modifier.height(18.dp))
@@ -218,7 +189,7 @@ fun LoginScreen(
                     text = "Regístrate",
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.clickable {
-                        navController.navigate("register")
+                        navController.navigate(MainRoutes.REGISTER)
                     }
                 )
             }

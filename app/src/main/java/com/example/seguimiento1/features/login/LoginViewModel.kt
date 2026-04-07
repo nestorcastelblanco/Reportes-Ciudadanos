@@ -1,10 +1,14 @@
 package com.example.seguimiento1.features.login
 
 import androidx.lifecycle.ViewModel
+import com.example.seguimiento1.di.RepositoryModule
+import com.example.seguimiento1.domain.repository.AuthRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-class LoginViewModel : ViewModel() {
+class LoginViewModel(
+    private val authRepository: AuthRepository = RepositoryModule.authRepository
+) : ViewModel() {
 
     private val _email = MutableStateFlow("")
     val email: StateFlow<String> = _email
@@ -20,7 +24,7 @@ class LoginViewModel : ViewModel() {
         _password.value = value
     }
 
-    fun login(): Boolean {
-        return email.value.isNotEmpty() && password.value.isNotEmpty()
+    suspend fun login(): Boolean {
+        return authRepository.login(email.value, password.value)
     }
 }

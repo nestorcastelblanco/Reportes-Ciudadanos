@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,8 +19,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 import com.example.seguimiento1.R
-import android.util.Patterns
 import androidx.compose.foundation.text.KeyboardOptions
+import com.example.seguimiento1.core.navigation.MainRoutes
+import com.example.seguimiento1.core.utils.FieldValidators
 
 @Composable
 fun RecoverPasswordScreen(
@@ -35,11 +36,7 @@ fun RecoverPasswordScreen(
     var emailTouched by remember { mutableStateOf(false) }
 
     // VALIDACIÓN
-    val emailError = when {
-        email.isEmpty() -> "El correo es obligatorio"
-        !Patterns.EMAIL_ADDRESS.matcher(email).matches() -> "Correo inválido"
-        else -> null
-    }
+    val emailError = FieldValidators.email(email)
 
     Scaffold(
         topBar = {
@@ -52,7 +49,7 @@ fun RecoverPasswordScreen(
             ) {
                 IconButton(onClick = { navController.popBackStack() }) {
                     Icon(
-                        imageVector = Icons.Default.ArrowBack,
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Volver"
                     )
                 }
@@ -139,9 +136,11 @@ fun RecoverPasswordScreen(
                     scope.launch {
                         if (emailError != null) {
                             snackbarHostState.showSnackbar("Ingrese un correo válido")
-                        } else {
+                        } else if (viewModel.recover()) {
                             snackbarHostState.showSnackbar("Enlace enviado")
-                            navController.navigate("new_password")
+                            navController.navigate(MainRoutes.NEW_PASSWORD)
+                        } else {
+                            snackbarHostState.showSnackbar("Correo no registrado")
                         }
                     }
                 }
@@ -155,8 +154,8 @@ fun RecoverPasswordScreen(
                 text = "Volver al inicio de sesión",
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.clickable {
-                    navController.navigate("login") {
-                        popUpTo("login") { inclusive = true }
+                    navController.navigate(MainRoutes.LOGIN) {
+                        popUpTo(MainRoutes.LOGIN) { inclusive = true }
                     }
                 }
             )

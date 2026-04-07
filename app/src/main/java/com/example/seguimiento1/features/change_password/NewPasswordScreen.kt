@@ -3,7 +3,7 @@ package com.example.seguimiento1.features.change_password
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -12,6 +12,8 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.seguimiento1.core.navigation.MainRoutes
+import com.example.seguimiento1.core.utils.FieldValidators
 import kotlinx.coroutines.launch
 
 @Composable
@@ -31,18 +33,8 @@ fun NewPasswordScreen(
     var confirmTouched by remember { mutableStateOf(false) }
 
     // VALIDACIONES
-    val passwordError = when {
-        password.isEmpty() -> "La contraseña es obligatoria"
-        password.length < 8 -> "Mínimo 8 caracteres"
-        !password.any { it.isDigit() } -> "Debe contener al menos un número"
-        else -> null
-    }
-
-    val confirmError = when {
-        confirmPassword.isEmpty() -> "Confirma la contraseña"
-        confirmPassword != password -> "Las contraseñas no coinciden"
-        else -> null
-    }
+    val passwordError = FieldValidators.password(password)
+    val confirmError = FieldValidators.confirmPassword(password, confirmPassword)
 
     Scaffold(
         topBar = {
@@ -54,7 +46,7 @@ fun NewPasswordScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = null)
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
                 }
 
                 Text(
@@ -144,8 +136,8 @@ fun NewPasswordScreen(
                 onClick = {
                     scope.launch {
                         snackbarHostState.showSnackbar("Contraseña actualizada")
-                        navController.navigate("login") {
-                            popUpTo("login") { inclusive = true }
+                        navController.navigate(MainRoutes.LOGIN) {
+                            popUpTo(MainRoutes.LOGIN) { inclusive = true }
                         }
                     }
                 }

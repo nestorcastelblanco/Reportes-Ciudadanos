@@ -12,9 +12,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.seguimiento1.R
+import com.example.seguimiento1.ui.components.AppPrimaryButton
 
 @Composable
-fun HomeScreen(navController: NavHostController) {
+fun HomeScreen(navController: NavHostController? = null) {
+    HomeScreen(navController = navController, onLogout = {})
+}
+
+@Composable
+fun HomeScreen(
+    navController: NavHostController? = null,
+    onLogout: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -22,6 +31,14 @@ fun HomeScreen(navController: NavHostController) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+
+        Text(
+            text = "Sesión iniciada",
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.primary
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         Image(
             painter = painterResource(id = R.mipmap.ic_launcher_foreground),
@@ -44,6 +61,14 @@ fun HomeScreen(navController: NavHostController) {
             fontSize = 16.sp,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        Spacer(modifier = Modifier.height(28.dp))
+
+        AppPrimaryButton(
+            text = "Cerrar sesión",
+            onClick = onLogout,
+            modifier = Modifier.padding(horizontal = 8.dp)
         )
     }
 }

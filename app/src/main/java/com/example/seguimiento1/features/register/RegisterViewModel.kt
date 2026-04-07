@@ -1,9 +1,14 @@
 package com.example.seguimiento1.features.register
 
 import androidx.lifecycle.ViewModel
+import com.example.seguimiento1.di.RepositoryModule
+import com.example.seguimiento1.domain.model.RegisterData
+import com.example.seguimiento1.domain.repository.AuthRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 
-class RegisterViewModel : ViewModel() {
+class RegisterViewModel(
+    private val authRepository: AuthRepository = RepositoryModule.authRepository
+) : ViewModel() {
 
     var ciudad = MutableStateFlow("")
         private set
@@ -47,9 +52,15 @@ class RegisterViewModel : ViewModel() {
         confirmPassword.value = value
     }
 
-    fun register(): Boolean {
-        return email.value.isNotEmpty()
-                && password.value.isNotEmpty()
-                && password.value == confirmPassword.value
+    suspend fun register(): Boolean {
+        val data = RegisterData(
+            nombre = nombre.value,
+            email = email.value,
+            telefono = telefono.value,
+            ciudad = ciudad.value,
+            password = password.value
+        )
+
+        return authRepository.register(data)
     }
 }
