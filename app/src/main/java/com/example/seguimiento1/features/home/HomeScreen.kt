@@ -264,14 +264,29 @@ private fun ReportCard(report: CitizenReport, onClick: () -> Unit) {
             }
 
             // Large image
-            AsyncImage(
-                model = report.imageUrl,
-                contentDescription = report.title,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp),
-                contentScale = ContentScale.Crop
-            )
+            if (report.imageUrl.isBlank()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                        .background(MaterialTheme.colorScheme.surfaceVariant),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = stringResource(R.string.report_photo_placeholder),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            } else {
+                AsyncImage(
+                    model = report.imageUrl,
+                    contentDescription = report.title,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp),
+                    contentScale = ContentScale.Crop
+                )
+            }
 
             // Content section
             Column(modifier = Modifier.padding(12.dp)) {

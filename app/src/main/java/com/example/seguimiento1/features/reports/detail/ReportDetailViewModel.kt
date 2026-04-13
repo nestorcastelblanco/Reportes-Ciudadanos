@@ -97,7 +97,12 @@ class ReportDetailViewModel @Inject constructor(
     fun toggleImportance() {
         viewModelScope.launch {
             val email = _currentEmail.value
+            val reporterEmail = report.value?.reporterEmail
+            val alreadyVoted = report.value?.voterEmails?.contains(email) == true
             reportRepository.toggleImportance(reportId, email)
+            if (!alreadyVoted && reporterEmail != null && reporterEmail != email) {
+                authRepository.addPoints(reporterEmail, 2)
+            }
         }
     }
 

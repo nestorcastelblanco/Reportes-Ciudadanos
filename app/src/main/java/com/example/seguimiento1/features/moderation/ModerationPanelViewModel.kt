@@ -10,6 +10,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -46,7 +47,11 @@ class ModerationPanelViewModel @Inject constructor(
     }
 
     fun verifyReport(reportId: String) {
-        viewModelScope.launch { reportRepository.verifyReport(reportId) }
+        viewModelScope.launch {
+            val report = reportRepository.reportsFlow.first().find { it.id == reportId }
+            reportRepository.verifyReport(reportId)
+            report?.let { authRepository.addPoints(it.reporterEmail, 25) }
+        }
     }
 
     fun rejectReport(reportId: String) {

@@ -64,8 +64,11 @@
     <string name="report_moderator_notice">Tu reporte será revisado por un moderador antes de ser publicado. Asegúrate de proporcionar información veraz.</string>
     <string name="report_suggest_category">Sugerir categoría</string>
     <string name="report_ai_hint">Escribe tu reporte y la IA sugerirá la categoría.</string>
+    <string name="report_category_suggested">Categoría sugerida: %1$s</string>
     <string name="report_no_connection_title">Sin Conexión</string>
     <string name="report_no_connection_msg">Sin conexión. Tu reporte se guardará y publicará automáticamente cuando recuperes la señal.</string>
+    <string name="report_address_map_hint">Selecciona una dirección sugerida para ubicar el reporte en el mapa.</string>
+    <string name="report_selected_location">Ubicación seleccionada</string>
 
     <!-- Report Detail -->
     <string name="report_detail_title">Detalle del Reporte</string>

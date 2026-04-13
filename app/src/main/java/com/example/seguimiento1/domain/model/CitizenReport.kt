@@ -10,6 +10,8 @@ data class CitizenReport(
     val imageUrl: String,
     val reporterEmail: String,
     val createdAtMillis: Long,
+    val latitude: Double? = null,
+    val longitude: Double? = null,
     val importance: Int = 0,
     val voterEmails: List<String> = emptyList(),
     val isResolved: Boolean = false

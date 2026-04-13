@@ -63,6 +63,7 @@ class ReviewReportViewModel @Inject constructor(
     fun verify() {
         viewModelScope.launch {
             reportRepository.verifyReport(reportId)
+            _report.value?.let { authRepository.addPoints(it.reporterEmail, 25) }
             _actionDone.value = true
         }
     }
@@ -77,6 +78,7 @@ class ReviewReportViewModel @Inject constructor(
     fun markResolved() {
         viewModelScope.launch {
             reportRepository.markResolved(reportId)
+            _report.value?.let { authRepository.addPoints(it.reporterEmail, 15) }
             _actionDone.value = true
         }
     }

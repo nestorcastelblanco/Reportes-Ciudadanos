@@ -119,9 +119,11 @@ class InMemoryReportRepository : ReportRepository {
             address = data.address,
             category = data.category,
             status = ReportStatus.PENDING,
-            imageUrl = "https://picsum.photos/seed/${data.title.hashCode()}/600/400",
+            imageUrl = data.imageUrl.orEmpty(),
             reporterEmail = data.reporterEmail,
-            createdAtMillis = System.currentTimeMillis()
+            createdAtMillis = System.currentTimeMillis(),
+            latitude = data.latitude,
+            longitude = data.longitude
         )
         reports.value = listOf(newReport) + reports.value
     }
