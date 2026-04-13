@@ -1,3 +1,258 @@
 <resources>
     <string name="app_name">Reportes Ciudadanos</string>
+    <string name="back">Volver</string>
+
+    <!-- Bottom Navigation -->
+
+    <!-- Map -->
+    <string name="map_search_hint">Buscar en el mapa…</string>
+    <string name="map_categories">Categorías</string>
+    <string name="nav_home">Inicio</string>
+    <string name="nav_map">Mapa</string>
+    <string name="nav_report">Reportar</string>
+    <string name="nav_data">Datos</string>
+    <string name="nav_profile">Perfil</string>
+
+    <!-- Home -->
+    <string name="home_title">Reportes Ciudadanos</string>
+    <string name="home_reports_section_title">Reportes recientes</string>
+    <string name="home_location">Bogotá, Colombia</string>
+    <string name="home_search_hint">Buscar reportes…</string>
+    <string name="home_nearby">Cercanos (&lt;1km)</string>
+    <string name="home_report_count">%1$d reportes</string>
+    <string name="home_importance">Es Importante</string>
+    <string name="home_time_ago">Hace %1$s</string>
+    <string name="create_report_cta">Crear reporte</string>
+    <string name="logout_button">Cerrar sesión</string>
+
+    <!-- Categories -->
+    <string name="category_security">Seguridad</string>
+    <string name="category_medical">Emergencias Médicas</string>
+    <string name="category_infrastructure">Infraestructura</string>
+    <string name="category_pets">Mascotas</string>
+    <string name="category_community">Comunidad</string>
+    <string name="category_all">Todas</string>
+
+    <!-- Status -->
+    <string name="status_pending">Pendiente</string>
+    <string name="status_verified">Verificado</string>
+    <string name="status_rejected">Rechazado</string>
+    <string name="status_resolved">Resuelto</string>
+
+    <!-- Notifications -->
+    <string name="notifications_title">Notificaciones</string>
+    <string name="notifications_placeholder">No hay notificaciones por ahora.</string>
+    <string name="notifications_today">HOY</string>
+    <string name="notifications_yesterday">AYER</string>
+    <string name="notifications_time_min">hace %1$d min</string>
+    <string name="notifications_time_hours">hace %1$dh</string>
+    <string name="notifications_time_days">hace %1$dd</string>
+
+    <!-- Create Report -->
+    <string name="create_report_title">Nuevo Reporte</string>
+    <string name="create_report_submit">Publicar Reporte</string>
+    <string name="report_title_label">Título del Reporte</string>
+    <string name="report_description_label">Descripción Detallada</string>
+    <string name="report_address_label">Dirección</string>
+    <string name="report_category_label">Categoría</string>
+    <string name="report_snackbar_required_fields">Completa todos los campos</string>
+    <string name="report_snackbar_created">Reporte creado</string>
+    <string name="report_add_photos">Agregar fotos</string>
+    <string name="report_gallery">Galería</string>
+    <string name="report_camera">Cámara</string>
+    <string name="report_location">Ubicación</string>
+    <string name="report_moderator_notice">Tu reporte será revisado por un moderador antes de ser publicado. Asegúrate de proporcionar información veraz.</string>
+    <string name="report_suggest_category">Sugerir categoría</string>
+    <string name="report_ai_hint">Escribe tu reporte y la IA sugerirá la categoría.</string>
+    <string name="report_no_connection_title">Sin Conexión</string>
+    <string name="report_no_connection_msg">Sin conexión. Tu reporte se guardará y publicará automáticamente cuando recuperes la señal.</string>
+
+    <!-- Report Detail -->
+    <string name="report_detail_title">Detalle del Reporte</string>
+    <string name="report_not_found">No se encontró el reporte.</string>
+    <string name="report_address_value">Dirección: %1$s</string>
+    <string name="report_status_value">Estado: %1$s</string>
+    <string name="report_category_value">Categoría: %1$s</string>
+    <string name="report_description_section">Descripción</string>
+    <string name="report_location_section">Ubicación</string>
+    <string name="report_importance_high">Alta (%1$d)</string>
+    <string name="report_importance_button">Es Importante %1$d</string>
+    <string name="report_comments_title">Comentarios (%1$d)</string>
+    <string name="report_comment_hint">Escribe un comentario…</string>
+    <string name="report_published_ago">Publicado hace %1$s</string>
+    <string name="report_importance">votos de importancia</string>
+    <string name="report_photo_placeholder">📷 Foto del reporte</string>
+
+    <!-- Edit Report -->
+    <string name="edit_report_title">Editar Reporte</string>
+    <string name="edit_report_save">Guardar Cambios</string>
+    <string name="edit_report_delete">Eliminar Reporte</string>
+    <string name="edit_report_resolved">¿Resuelto?</string>
+    <string name="edit_report_saved">Cambios guardados</string>
+    <string name="edit_report_deleted">Reporte eliminado</string>
+
+    <!-- Validators -->
+    <string name="validator_required_email">El correo es obligatorio</string>
+    <string name="validator_invalid_email">Correo inválido</string>
+    <string name="validator_required_password">La contraseña es obligatoria</string>
+    <string name="validator_password_min_length">Mínimo 8 caracteres</string>
+    <string name="validator_password_requires_digit">Debe contener al menos un número</string>
+    <string name="validator_confirm_password_required">Confirma la contraseña</string>
+    <string name="validator_password_mismatch">Las contraseñas no coinciden</string>
+
+    <!-- Register Validators -->
+    <string name="register_required_name">El nombre es obligatorio</string>
+    <string name="register_name_min_length">Debe tener mínimo 3 caracteres</string>
+    <string name="register_required_phone">El teléfono es obligatorio</string>
+    <string name="register_phone_min_length">Debe tener al menos 10 dígitos</string>
+    <string name="register_phone_digits_only">Solo debe contener números</string>
+    <string name="register_required_city">La ciudad es obligatoria</string>
+    <string name="register_invalid_city">Nombre de ciudad inválido</string>
+
+    <!-- Auth Header -->
+    <string name="auth_header_title">CIUDAD ALERTA</string>
+    <string name="auth_header_subtitle">REPORTES CIUDADANOS</string>
+    <string name="auth_header_caption">Tu comunidad, más segura</string>
+    <string name="auth_logo_content_description">Logo</string>
+
+    <!-- Login -->
+    <string name="login_email_label">Correo Electrónico</string>
+    <string name="login_password_label">Contraseña</string>
+    <string name="login_forgot_password">¿Olvidaste tu contraseña?</string>
+    <string name="login_button">Iniciar Sesión</string>
+    <string name="login_fix_email">Corrige el correo</string>
+    <string name="login_fix_password">Corrige la contraseña</string>
+    <string name="login_invalid_credentials">Credenciales incorrectas</string>
+    <string name="login_moderator_button">Ingresar como moderador</string>
+    <string name="login_moderator_soon">Moderador (próximamente)</string>
+    <string name="login_no_account">¿No tienes cuenta? </string>
+    <string name="login_register_link">Regístrate</string>
+
+    <!-- Register -->
+    <string name="register_title">Crear Cuenta</string>
+    <string name="register_subtitle">Únete a la comunidad y ayuda a mantener tu entorno seguro.</string>
+    <string name="register_name_label">Nombre Completo</string>
+    <string name="register_email_label">Correo Electrónico</string>
+    <string name="register_phone_label">Teléfono</string>
+    <string name="register_city_label">Ciudad</string>
+    <string name="register_password_label">Contraseña</string>
+    <string name="register_confirm_password_label">Confirmar Contraseña</string>
+    <string name="register_button">Registrarme</string>
+    <string name="register_fix_fields">Corrige los campos marcados</string>
+    <string name="register_success">Registro exitoso</string>
+    <string name="register_error">Error en registro</string>
+    <string name="register_terms">Al registrarte, aceptas nuestros Términos de Servicio y Política de Privacidad.</string>
+    <string name="register_have_account">¿Ya tienes cuenta? </string>
+    <string name="register_login_link">Inicia Sesión</string>
+
+    <!-- Recover Password -->
+    <string name="recover_title">Recuperar Contraseña</string>
+    <string name="recover_question">¿No recuerdas tu contraseña?</string>
+    <string name="recover_instruction">Ingresa tu correo y te enviaremos un enlace para ingresar tu nueva contraseña.</string>
+    <string name="recover_email_label">Correo Electrónico</string>
+    <string name="recover_invalid_email">Ingresa un correo válido</string>
+    <string name="recover_link_sent">Enlace enviado</string>
+    <string name="recover_email_not_registered">Correo no registrado</string>
+    <string name="recover_send_link">Enviar enlace de recuperación</string>
+    <string name="recover_back_to_login">Volver al inicio de sesión</string>
+
+    <!-- New Password (Recovery flow) -->
+    <string name="new_password_title">Nueva Contraseña</string>
+    <string name="new_password_subtitle">Crea tu nueva contraseña</string>
+    <string name="new_password_label">Contraseña nueva</string>
+    <string name="new_password_confirm_label">Confirmar Contraseña nueva</string>
+    <string name="new_password_updated">Contraseña actualizada</string>
+    <string name="new_password_update_button">Actualizar Contraseña</string>
+
+    <!-- Change Password (logged-in) -->
+    <string name="change_password_title">Nueva Contraseña</string>
+    <string name="change_password_subtitle">Crea tu nueva contraseña</string>
+    <string name="change_password_old_label">Contraseña antigua</string>
+    <string name="change_password_new_label">Contraseña nueva</string>
+    <string name="change_password_confirm_label">Confirmar Contraseña nueva</string>
+    <string name="change_password_button">Actualizar Contraseña</string>
+    <string name="change_password_success">Contraseña actualizada correctamente</string>
+    <string name="change_password_wrong_old">La contraseña antigua es incorrecta</string>
+
+    <!-- Profile -->
+    <string name="profile_title">Mi Perfil</string>
+    <string name="profile_member_since">Miembro desde %1$s</string>
+    <string name="profile_next_level">Siguiente nivel: %1$s</string>
+    <string name="profile_points">%1$d / %2$d pts</string>
+    <string name="profile_email_label">Correo Electrónico</string>
+    <string name="profile_phone_label">Teléfono</string>
+    <string name="profile_city_label">Ciudad</string>
+    <string name="profile_my_reports">Mis Reportes</string>
+    <string name="profile_change_password">Cambiar contraseña</string>
+    <string name="profile_reputation">Reputación y logros</string>
+    <string name="profile_logout">Cerrar sesión</string>
+    <string name="profile_delete_account">Eliminar cuenta</string>
+    <string name="profile_logout_success">Sesión cerrada correctamente</string>
+    <string name="profile_delete_title">¿Eliminar cuenta?</string>
+    <string name="profile_delete_message">Esta acción eliminará permanentemente tu cuenta y todos tus reportes. No se puede deshacer.</string>
+    <string name="profile_delete_cancel">Cancelar</string>
+    <string name="profile_delete_confirm">Sí, eliminar mi cuenta</string>
+
+    <!-- My Reports -->
+    <string name="my_reports_title">Mis Reportes</string>
+    <string name="my_reports_today">HOY</string>
+    <string name="my_reports_yesterday">AYER</string>
+    <string name="my_reports_empty">No tienes reportes aún.</string>
+
+    <!-- Statistics -->
+    <string name="statistics_title">Mis Estadísticas</string>
+    <string name="statistics_active">Activos</string>
+    <string name="statistics_finished">Finalizados</string>
+    <string name="statistics_pending">Pendientes</string>
+    <string name="statistics_by_category">Reportes por categoría</string>
+    <string name="statistics_monthly_activity">Actividad mensual</string>
+    <string name="statistics_total">Total de reportes: %1$d</string>
+
+    <!-- Reputation -->
+    <string name="reputation_title">Reputación y Logros</string>
+    <string name="reputation_total_points">Puntos Totales</string>
+    <string name="reputation_level">Nivel: %1$s</string>
+    <string name="reputation_level_progress">Progreso de niveles</string>
+    <string name="reputation_points_to_next">Te faltan %1$d puntos para alcanzar el nivel %2$s.</string>
+    <string name="reputation_how_to_earn">Cómo ganar puntos</string>
+    <string name="reputation_publish_report">Publicar un reporte</string>
+    <string name="reputation_verified_report">Reporte verificado</string>
+    <string name="reputation_importance_vote">Recibir voto \'Es importante\'</string>
+    <string name="reputation_comment">Comentar en un reporte</string>
+    <string name="reputation_resolved_report">Reporte marcado como resuelto</string>
+    <string name="reputation_badges">Insignias</string>
+    <string name="reputation_badges_unlocked">%1$d/%2$d desbloqueadas</string>
+
+    <!-- Moderation -->
+    <string name="moderation_title">Panel de Moderación</string>
+    <string name="moderation_moderator">Moderador: %1$s</string>
+    <string name="moderation_pending">Pendientes</string>
+    <string name="moderation_verified">Verificados</string>
+    <string name="moderation_rejected">Rechazados</string>
+    <string name="moderation_total">Total</string>
+    <string name="moderation_no_reports">No hay reportes en esta categoría.</string>
+    <string name="moderation_logout">Cerrar Sesión</string>
+    <string name="moderation_verify">Verificar</string>
+    <string name="moderation_reject">Rechazar</string>
+
+    <!-- Review Report -->
+    <string name="review_report_title">Revisar Reporte</string>
+    <string name="review_verify">Verificar Reporte</string>
+    <string name="review_reject">Rechazar Reporte</string>
+    <string name="review_reject_reason">Motivo del rechazo (opcional)</string>
+    <string name="review_reject_hint">Escribe el motivo…</string>
+    <string name="review_mark_resolved">Marcar como Resuelto</string>
+    <string name="review_reporter_info">Información del reportante</string>
+    <string name="review_total_reports">Reportes totales</string>
+    <string name="review_verified_reports">Verificados</string>
+    <string name="review_actions">Acciones de moderación</string>
+    <string name="review_reporter_history">Historial del reportante</string>
+    <string name="review_history_total">Total: %1$d</string>
+    <string name="review_history_verified">Verificados: %1$d</string>
+    <string name="review_history_rejected">Rechazados: %1$d</string>
+    <string name="review_history_pending">Pendientes: %1$d</string>
+    <string name="review_moderation_actions">Acciones de moderación</string>
+    <string name="review_verified_success">Reporte verificado</string>
+    <string name="review_rejected_success">Reporte rechazado</string>
+    <string name="review_resolved_success">Reporte marcado como resuelto</string>
 </resources>

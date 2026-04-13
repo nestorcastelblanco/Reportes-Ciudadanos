@@ -16,16 +16,13 @@ fun NavGraphBuilder.authGraph(
     navController: NavHostController,
     onLoginSuccess: (String) -> Unit
 ) {
-    navigation(
-        route = MainRoutes.AUTH_GRAPH,
-        startDestination = MainRoutes.LOGIN
-    ) {
-        composable(MainRoutes.LOGIN) {
+    navigation<AuthGraph>(startDestination = LoginRoute) {
+        composable<LoginRoute> {
             LoginScreen(navController, onLoginSuccess)
         }
-        composable(MainRoutes.REGISTER) { RegisterScreen(navController) }
-        composable(MainRoutes.RECOVER_PASSWORD) { RecoverPasswordScreen(navController) }
-        composable(MainRoutes.NEW_PASSWORD) { NewPasswordScreen(navController) }
+        composable<RegisterRoute> { RegisterScreen(navController) }
+        composable<RecoverPasswordRoute> { RecoverPasswordScreen(navController) }
+        composable<NewPasswordRoute> { NewPasswordScreen(navController) }
     }
 }
 

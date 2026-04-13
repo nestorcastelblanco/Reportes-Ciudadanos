@@ -9,6 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.seguimiento1.R
 
@@ -16,18 +17,18 @@ import com.example.seguimiento1.R
 fun AuthHeader() {
     Image(
         painter = painterResource(id = R.mipmap.ic_launcher_foreground),
-        contentDescription = "Logo",
+        contentDescription = stringResource(R.string.auth_logo_content_description),
         modifier = Modifier.size(180.dp)
     )
 
     Text(
-        text = "CIUDAD ALERTA",
+        text = stringResource(R.string.auth_header_title),
         style = MaterialTheme.typography.headlineMedium,
         color = MaterialTheme.colorScheme.primary
     )
 
     Text(
-        text = "REPORTES CIUDADANOS",
+        text = stringResource(R.string.auth_header_subtitle),
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.secondary
     )
@@ -35,7 +36,7 @@ fun AuthHeader() {
     Spacer(modifier = Modifier.height(8.dp))
 
     Text(
-        text = "Tu comunidad, mas segura",
+        text = stringResource(R.string.auth_header_caption),
         style = MaterialTheme.typography.bodySmall
     )
 }

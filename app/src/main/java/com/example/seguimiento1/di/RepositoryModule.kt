@@ -2,38 +2,57 @@ package com.example.seguimiento1.di
 
 import android.content.Context
 import com.example.seguimiento1.data.datastore.SessionDataStore
-import com.example.seguimiento1.data.datastore.UsersDataStore
-import com.example.seguimiento1.data.repository.DataStoreAuthRepository
+import com.example.seguimiento1.data.repository.InMemoryAuthRepository
+import com.example.seguimiento1.data.repository.InMemoryCommentRepository
+import com.example.seguimiento1.data.repository.InMemoryNotificationRepository
+import com.example.seguimiento1.data.repository.InMemoryReportRepository
 import com.example.seguimiento1.data.repository.SessionRepositoryImpl
 import com.example.seguimiento1.domain.repository.AuthRepository
+import com.example.seguimiento1.domain.repository.CommentRepository
+import com.example.seguimiento1.domain.repository.NotificationRepository
+import com.example.seguimiento1.domain.repository.ReportRepository
 import com.example.seguimiento1.domain.repository.SessionRepository
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 
+@Module
+@InstallIn(SingletonComponent::class)
 object RepositoryModule {
-    private lateinit var appContext: Context
 
-    fun init(context: Context) {
-        appContext = context.applicationContext
+    @Provides
+    @Singleton
+    fun provideAuthRepository(): AuthRepository {
+        return InMemoryAuthRepository()
     }
 
-    val authRepository: AuthRepository by lazy {
-        check(::appContext.isInitialized) {
-            "RepositoryModule must be initialized before requesting authRepository"
-        }
-
-        DataStoreAuthRepository(
-            usersDataStore = UsersDataStore(appContext)
+    @Provides
+    @Singleton
+    fun provideSessionRepository(@ApplicationContext context: Context): SessionRepository {
+        return SessionRepositoryImpl(
+            sessionDataStore = SessionDataStore(context)
         )
     }
 
-    @Volatile
-    private var sessionRepository: SessionRepository? = null
+    @Provides
+    @Singleton
+    fun provideReportRepository(): ReportRepository {
+        return InMemoryReportRepository()
+    }
 
-    fun provideSessionRepository(context: Context): SessionRepository {
-        return sessionRepository ?: synchronized(this) {
-            sessionRepository ?: SessionRepositoryImpl(
-                sessionDataStore = SessionDataStore(context)
-            ).also { sessionRepository = it }
-        }
+    @Provides
+    @Singleton
+    fun provideCommentRepository(): CommentRepository {
+        return InMemoryCommentRepository()
+    }
+
+    @Provides
+    @Singleton
+    fun provideNotificationRepository(): NotificationRepository {
+        return InMemoryNotificationRepository()
     }
 }
 

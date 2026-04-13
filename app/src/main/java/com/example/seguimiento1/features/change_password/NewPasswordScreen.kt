@@ -8,11 +8,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.example.seguimiento1.core.navigation.MainRoutes
+import androidx.compose.ui.platform.LocalContext
+import com.example.seguimiento1.R
+import com.example.seguimiento1.core.navigation.LoginRoute
 import com.example.seguimiento1.core.utils.FieldValidators
 import kotlinx.coroutines.launch
 
@@ -20,6 +23,7 @@ import kotlinx.coroutines.launch
 fun NewPasswordScreen(
     navController: NavHostController
 ) {
+    val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
@@ -50,7 +54,7 @@ fun NewPasswordScreen(
                 }
 
                 Text(
-                    text = "Nueva Contraseña",
+                    text = stringResource(R.string.new_password_title),
                     style = MaterialTheme.typography.titleLarge
                 )
             }
@@ -69,7 +73,7 @@ fun NewPasswordScreen(
             Spacer(modifier = Modifier.height(40.dp))
 
             Text(
-                text = "Crea tu nueva contraseña",
+                text = stringResource(R.string.new_password_subtitle),
                 style = MaterialTheme.typography.headlineSmall
             )
 
@@ -82,7 +86,7 @@ fun NewPasswordScreen(
                     if (!passwordTouched) passwordTouched = true
                     password = it
                 },
-                label = { Text("Nueva Contraseña") },
+                label = { Text(stringResource(R.string.new_password_label)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 visualTransformation = if (passwordVisible)
@@ -93,7 +97,7 @@ fun NewPasswordScreen(
                 supportingText = {
                     if (passwordTouched) {
                         passwordError?.let {
-                            Text(it, color = MaterialTheme.colorScheme.error)
+                            Text(stringResource(it), color = MaterialTheme.colorScheme.error)
                         }
                     }
                 }
@@ -108,7 +112,7 @@ fun NewPasswordScreen(
                     if (!confirmTouched) confirmTouched = true
                     confirmPassword = it
                 },
-                label = { Text("Confirmar Contraseña") },
+                label = { Text(stringResource(R.string.new_password_confirm_label)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 visualTransformation = if (confirmVisible)
@@ -119,7 +123,7 @@ fun NewPasswordScreen(
                 supportingText = {
                     if (confirmTouched) {
                         confirmError?.let {
-                            Text(it, color = MaterialTheme.colorScheme.error)
+                            Text(stringResource(it), color = MaterialTheme.colorScheme.error)
                         }
                     }
                 }
@@ -135,14 +139,14 @@ fun NewPasswordScreen(
                 enabled = passwordError == null && confirmError == null,
                 onClick = {
                     scope.launch {
-                        snackbarHostState.showSnackbar("Contraseña actualizada")
-                        navController.navigate(MainRoutes.LOGIN) {
-                            popUpTo(MainRoutes.LOGIN) { inclusive = true }
+                        snackbarHostState.showSnackbar(context.getString(R.string.new_password_updated))
+                        navController.navigate(LoginRoute) {
+                            popUpTo(LoginRoute) { inclusive = true }
                         }
                     }
                 }
             ) {
-                Text("Actualizar Contraseña")
+                Text(stringResource(R.string.new_password_update_button))
             }
         }
     }

@@ -1,13 +1,15 @@
 package com.example.seguimiento1.features.register
 
 import androidx.lifecycle.ViewModel
-import com.example.seguimiento1.di.RepositoryModule
 import com.example.seguimiento1.domain.model.RegisterData
 import com.example.seguimiento1.domain.repository.AuthRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 
-class RegisterViewModel(
-    private val authRepository: AuthRepository = RepositoryModule.authRepository
+@HiltViewModel
+class RegisterViewModel @Inject constructor(
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     var ciudad = MutableStateFlow("")

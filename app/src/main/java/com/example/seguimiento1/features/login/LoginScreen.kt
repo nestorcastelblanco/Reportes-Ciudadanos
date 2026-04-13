@@ -6,13 +6,17 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
-import com.example.seguimiento1.core.navigation.MainRoutes
+import com.example.seguimiento1.R
+import com.example.seguimiento1.core.navigation.RecoverPasswordRoute
+import com.example.seguimiento1.core.navigation.RegisterRoute
 import com.example.seguimiento1.core.utils.FieldValidators
 import com.example.seguimiento1.ui.components.AppPrimaryButton
 import com.example.seguimiento1.ui.components.AuthHeader
@@ -20,7 +24,7 @@ import com.example.seguimiento1.ui.components.AuthHeader
 @Composable
 fun LoginScreen(
     navController: NavHostController,
-    viewModel: LoginViewModel = viewModel()
+    viewModel: LoginViewModel = hiltViewModel()
 ) {
     LoginScreen(
         navController = navController,
@@ -33,8 +37,9 @@ fun LoginScreen(
 fun LoginScreen(
     navController: NavHostController,
     onLoginSuccess: (String) -> Unit,
-    viewModel: LoginViewModel = viewModel()
+    viewModel: LoginViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val email by viewModel.email.collectAsState()
@@ -77,7 +82,7 @@ fun LoginScreen(
                     if (!emailTouched) emailTouched = true
                     viewModel.onEmailChange(it)
                 },
-                label = { Text("Correo Electrónico") },
+                label = { Text(stringResource(R.string.login_email_label)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 isError = emailTouched && emailError != null,
@@ -85,7 +90,7 @@ fun LoginScreen(
                     if (emailTouched) {
                         emailError?.let {
                             Text(
-                                text = it,
+                                text = stringResource(it),
                                 color = MaterialTheme.colorScheme.error
                             )
                         }
@@ -104,7 +109,7 @@ fun LoginScreen(
                     if (!passwordTouched) passwordTouched = true
                     viewModel.onPasswordChange(it)
                 },
-                label = { Text("Contraseña") },
+                label = { Text(stringResource(R.string.login_password_label)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 visualTransformation = if (passwordVisible)
@@ -116,7 +121,7 @@ fun LoginScreen(
                     if (passwordTouched) {
                         passwordError?.let {
                             Text(
-                                text = it,
+                                text = stringResource(it),
                                 color = MaterialTheme.colorScheme.error
                             )
                         }
@@ -127,31 +132,33 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             TextButton(
-                onClick = { navController.navigate(MainRoutes.RECOVER_PASSWORD) },
+                onClick = { navController.navigate(RecoverPasswordRoute) },
                 modifier = Modifier.align(Alignment.End)
             ) {
-                Text("¿Olvidaste tu contraseña?")
+                Text(stringResource(R.string.login_forgot_password))
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             AppPrimaryButton(
-                text = "Iniciar Sesion",
+                text = stringResource(R.string.login_button),
                 onClick = {
                     scope.launch {
                         when {
                             emailError != null ->
-                                snackbarHostState.showSnackbar("Corrige el correo")
+                                snackbarHostState.showSnackbar(context.getString(R.string.login_fix_email))
 
                             passwordError != null ->
-                                snackbarHostState.showSnackbar("Corrige la contraseña")
+                                snackbarHostState.showSnackbar(context.getString(R.string.login_fix_password))
 
                             viewModel.login() -> {
                                 onLoginSuccess(email)
                             }
 
                             else ->
-                                snackbarHostState.showSnackbar("Credenciales incorrectas")
+                                snackbarHostState.showSnackbar(
+                                    context.getString(R.string.login_invalid_credentials)
+                                )
                         }
                     }
                 }
@@ -167,13 +174,24 @@ fun LoginScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
-                enabled = false,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.secondary
                 ),
-                onClick = {}
+                onClick = {
+                    viewModel.onEmailChange("mod@ciudad.com")
+                    viewModel.onPasswordChange("mod12345")
+                    scope.launch {
+                        if (viewModel.login()) {
+                            onLoginSuccess("mod@ciudad.com")
+                        } else {
+                            snackbarHostState.showSnackbar(
+                                context.getString(R.string.login_invalid_credentials)
+                            )
+                        }
+                    }
+                }
             ) {
-                Text("Moderador (proximamente)")
+                Text(stringResource(R.string.login_moderator_button))
             }
 
             Spacer(modifier = Modifier.height(18.dp))
@@ -183,13 +201,13 @@ fun LoginScreen(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("¿No tienes cuenta? ")
+                Text(stringResource(R.string.login_no_account))
 
                 Text(
-                    text = "Regístrate",
+                    text = stringResource(R.string.login_register_link),
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.clickable {
-                        navController.navigate(MainRoutes.REGISTER)
+                        navController.navigate(RegisterRoute)
                     }
                 )
             }

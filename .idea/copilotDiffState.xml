@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CopilotDiffPersistence">
+    <option name="pendingDiffs">
+      <map>
+        <entry key="$PROJECT_DIR$/app/src/main/java/com/example/seguimiento1/data/datastore/UsersDataStore.kt">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/app/src/main/java/com/example/seguimiento1/data/datastore/UsersDataStore.kt" />
+              <option name="updatedContent" value="package com.example.seguimiento1.data.datastore&#10;&#10;import android.content.Context&#10;import androidx.datastore.preferences.core.Preferences&#10;import androidx.datastore.preferences.core.edit&#10;import androidx.datastore.preferences.core.stringPreferencesKey&#10;import androidx.datastore.preferences.preferencesDataStore&#10;import kotlinx.coroutines.flow.Flow&#10;import kotlinx.coroutines.flow.map&#10;import org.json.JSONObject&#10;&#10;private val Context.usersDataStore by preferencesDataStore(name = &quot;users_prefs&quot;)&#10;&#10;class UsersDataStore(private val context: Context) {&#10;&#10;    private object Keys {&#10;        val usersJson: Preferences.Key&lt;String&gt; = stringPreferencesKey(&quot;users_json&quot;)&#10;    }&#10;&#10;    val usersFlow: Flow&lt;Map&lt;String, String&gt;&gt; = context.usersDataStore.data.map { prefs -&gt;&#10;        decodeUsers(prefs[Keys.usersJson])&#10;    }&#10;&#10;    suspend fun saveUsers(users: Map&lt;String, String&gt;) {&#10;        context.usersDataStore.edit { prefs -&gt;&#10;            prefs[Keys.usersJson] = encodeUsers(users)&#10;        }&#10;    }&#10;&#10;    private fun decodeUsers(raw: String?): Map&lt;String, String&gt; {&#10;        if (raw.isNullOrBlank()) {&#10;            return mapOf(&quot;demo@ciudad.com&quot; to &quot;demo1234&quot;)&#10;        }&#10;&#10;        return try {&#10;            val jsonObject = JSONObject(raw)&#10;            buildMap {&#10;                val keys = jsonObject.keys()&#10;                while (keys.hasNext()) {&#10;                    val key = keys.next()&#10;                    put(key, jsonObject.optString(key))&#10;                }&#10;            }&#10;        } catch (_: Exception) {&#10;            mapOf(&quot;demo@ciudad.com&quot; to &quot;demo1234&quot;)&#10;        }&#10;    }&#10;&#10;    private fun encodeUsers(users: Map&lt;String, String&gt;): String {&#10;        return JSONObject(users).toString()&#10;    }&#10;}&#10;" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>

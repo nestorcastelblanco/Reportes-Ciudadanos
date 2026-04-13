@@ -1,13 +1,15 @@
 package com.example.seguimiento1.features.login
 
 import androidx.lifecycle.ViewModel
-import com.example.seguimiento1.di.RepositoryModule
 import com.example.seguimiento1.domain.repository.AuthRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-class LoginViewModel(
-    private val authRepository: AuthRepository = RepositoryModule.authRepository
+@HiltViewModel
+class LoginViewModel @Inject constructor(
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _email = MutableStateFlow("")
