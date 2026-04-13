@@ -18,16 +18,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import com.example.seguimiento1.R
 import androidx.compose.foundation.text.KeyboardOptions
-import com.example.seguimiento1.core.utils.FieldValidators
 
 @Composable
 fun RegisterScreen(
-    navController: NavHostController,
+    onNavigateBack: () -> Unit,
     viewModel: RegisterViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
@@ -44,40 +42,6 @@ fun RegisterScreen(
     var passwordVisible by remember { mutableStateOf(false) }
     var confirmVisible by remember { mutableStateOf(false) }
 
-    // CONTROL DE CAMPOS TOCADOS
-    var nombreTouched by remember { mutableStateOf(false) }
-    var emailTouched by remember { mutableStateOf(false) }
-    var telefonoTouched by remember { mutableStateOf(false) }
-    var ciudadTouched by remember { mutableStateOf(false) }
-    var passwordTouched by remember { mutableStateOf(false) }
-    var confirmTouched by remember { mutableStateOf(false) }
-
-    // VALIDACIONES
-
-    val nombreError = when {
-        nombre.isEmpty() -> R.string.register_required_name
-        nombre.length < 3 -> R.string.register_name_min_length
-        else -> null
-    }
-
-    val emailError = FieldValidators.email(email)
-
-    val telefonoError = when {
-        telefono.isEmpty() -> R.string.register_required_phone
-        telefono.length < 10 -> R.string.register_phone_min_length
-        !telefono.all { it.isDigit() } -> R.string.register_phone_digits_only
-        else -> null
-    }
-
-    val ciudadError = when {
-        ciudad.isEmpty() -> R.string.register_required_city
-        ciudad.length < 3 -> R.string.register_invalid_city
-        else -> null
-    }
-
-    val passwordError = FieldValidators.password(password)
-    val confirmError = FieldValidators.confirmPassword(password, confirmPassword)
-
     Scaffold(
         topBar = {
             Row(
@@ -87,7 +51,7 @@ fun RegisterScreen(
                     .padding(horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = { navController.popBackStack() }) {
+                IconButton(onClick = onNavigateBack) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = null
@@ -123,20 +87,15 @@ fun RegisterScreen(
 
             // NOMBRE
             OutlinedTextField(
-                value = nombre,
-                onValueChange = {
-                    if (!nombreTouched) nombreTouched = true
-                    viewModel.nombre(it)
-                },
+                value = nombre.value,
+                onValueChange = { viewModel.onNombreChange(it) },
                 label = { Text(stringResource(R.string.register_name_label)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                isError = nombreTouched && nombreError != null,
+                isError = nombre.isTouched && !nombre.isValid,
                 supportingText = {
-                    if (nombreTouched) {
-                        nombreError?.let {
-                            Text(stringResource(it), color = MaterialTheme.colorScheme.error)
-                        }
+                    if (nombre.isTouched && nombre.error != null) {
+                        Text(nombre.error!!, color = MaterialTheme.colorScheme.error)
                     }
                 }
             )
@@ -145,21 +104,16 @@ fun RegisterScreen(
 
             // EMAIL
             OutlinedTextField(
-                value = email,
-                onValueChange = {
-                    if (!emailTouched) emailTouched = true
-                    viewModel.onEmailChange(it)
-                },
+                value = email.value,
+                onValueChange = { viewModel.onEmailChange(it) },
                 label = { Text(stringResource(R.string.register_email_label)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                isError = emailTouched && emailError != null,
+                isError = email.isTouched && !email.isValid,
                 supportingText = {
-                    if (emailTouched) {
-                        emailError?.let {
-                            Text(stringResource(it), color = MaterialTheme.colorScheme.error)
-                        }
+                    if (email.isTouched && email.error != null) {
+                        Text(email.error!!, color = MaterialTheme.colorScheme.error)
                     }
                 }
             )
@@ -168,21 +122,16 @@ fun RegisterScreen(
 
             // TELEFONO (NUMÉRICO)
             OutlinedTextField(
-                value = telefono,
-                onValueChange = {
-                    if (!telefonoTouched) telefonoTouched = true
-                    viewModel.telefono(it)
-                },
+                value = telefono.value,
+                onValueChange = { viewModel.onTelefonoChange(it) },
                 label = { Text(stringResource(R.string.register_phone_label)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                isError = telefonoTouched && telefonoError != null,
+                isError = telefono.isTouched && !telefono.isValid,
                 supportingText = {
-                    if (telefonoTouched) {
-                        telefonoError?.let {
-                            Text(stringResource(it), color = MaterialTheme.colorScheme.error)
-                        }
+                    if (telefono.isTouched && telefono.error != null) {
+                        Text(telefono.error!!, color = MaterialTheme.colorScheme.error)
                     }
                 }
             )
@@ -191,20 +140,15 @@ fun RegisterScreen(
 
             // CIUDAD
             OutlinedTextField(
-                value = ciudad,
-                onValueChange = {
-                    if (!ciudadTouched) ciudadTouched = true
-                    viewModel.ciudad(it)
-                },
+                value = ciudad.value,
+                onValueChange = { viewModel.onCiudadChange(it) },
                 label = { Text(stringResource(R.string.register_city_label)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                isError = ciudadTouched && ciudadError != null,
+                isError = ciudad.isTouched && !ciudad.isValid,
                 supportingText = {
-                    if (ciudadTouched) {
-                        ciudadError?.let {
-                            Text(stringResource(it), color = MaterialTheme.colorScheme.error)
-                        }
+                    if (ciudad.isTouched && ciudad.error != null) {
+                        Text(ciudad.error!!, color = MaterialTheme.colorScheme.error)
                     }
                 }
             )
@@ -213,11 +157,8 @@ fun RegisterScreen(
 
             // PASSWORD
             OutlinedTextField(
-                value = password,
-                onValueChange = {
-                    if (!passwordTouched) passwordTouched = true
-                    viewModel.onPasswordChange(it)
-                },
+                value = password.value,
+                onValueChange = { viewModel.onPasswordChange(it) },
                 label = { Text(stringResource(R.string.register_password_label)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
@@ -225,12 +166,10 @@ fun RegisterScreen(
                     VisualTransformation.None
                 else
                     PasswordVisualTransformation(),
-                isError = passwordTouched && passwordError != null,
+                isError = password.isTouched && !password.isValid,
                 supportingText = {
-                    if (passwordTouched) {
-                        passwordError?.let {
-                            Text(stringResource(it), color = MaterialTheme.colorScheme.error)
-                        }
+                    if (password.isTouched && password.error != null) {
+                        Text(password.error!!, color = MaterialTheme.colorScheme.error)
                     }
                 }
             )
@@ -239,11 +178,8 @@ fun RegisterScreen(
 
             // CONFIRM PASSWORD
             OutlinedTextField(
-                value = confirmPassword,
-                onValueChange = {
-                    if (!confirmTouched) confirmTouched = true
-                    viewModel.onConfirmPasswordChange(it)
-                },
+                value = confirmPassword.value,
+                onValueChange = { viewModel.onConfirmPasswordChange(it) },
                 label = { Text(stringResource(R.string.register_confirm_password_label)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
@@ -251,12 +187,10 @@ fun RegisterScreen(
                     VisualTransformation.None
                 else
                     PasswordVisualTransformation(),
-                isError = confirmTouched && confirmError != null,
+                isError = confirmPassword.isTouched && !confirmPassword.isValid,
                 supportingText = {
-                    if (confirmTouched) {
-                        confirmError?.let {
-                            Text(stringResource(it), color = MaterialTheme.colorScheme.error)
-                        }
+                    if (confirmPassword.isTouched && confirmPassword.error != null) {
+                        Text(confirmPassword.error!!, color = MaterialTheme.colorScheme.error)
                     }
                 }
             )
@@ -270,21 +204,14 @@ fun RegisterScreen(
                 shape = RoundedCornerShape(30.dp),
                 onClick = {
                     scope.launch {
-                        if (
-                            nombreError != null ||
-                            emailError != null ||
-                            telefonoError != null ||
-                            ciudadError != null ||
-                            passwordError != null ||
-                            confirmError != null
-                        ) {
+                        if (!viewModel.isFormValid) {
                             snackbarHostState.showSnackbar(context.getString(R.string.register_fix_fields))
                             return@launch
                         }
 
                         if (viewModel.register()) {
                             snackbarHostState.showSnackbar(context.getString(R.string.register_success))
-                            navController.popBackStack()
+                            onNavigateBack()
                         } else {
                             snackbarHostState.showSnackbar(context.getString(R.string.register_error))
                         }
@@ -311,7 +238,7 @@ fun RegisterScreen(
                     text = stringResource(R.string.register_login_link),
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.clickable {
-                        navController.popBackStack()
+                        onNavigateBack()
                     }
                 )
             }

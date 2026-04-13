@@ -31,9 +31,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.seguimiento1.R
-import com.example.seguimiento1.core.utils.FieldValidators
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -48,9 +47,6 @@ fun ChangePasswordScreen(
     val oldPassword by viewModel.oldPassword.collectAsState()
     val newPassword by viewModel.newPassword.collectAsState()
     val confirmPassword by viewModel.confirmPassword.collectAsState()
-
-    val newPasswordError = FieldValidators.password(newPassword)
-    val confirmError = FieldValidators.confirmPassword(newPassword, confirmPassword)
 
     Scaffold(
         topBar = {
@@ -82,7 +78,7 @@ fun ChangePasswordScreen(
             Spacer(modifier = Modifier.height(32.dp))
 
             OutlinedTextField(
-                value = oldPassword,
+                value = oldPassword.value,
                 onValueChange = viewModel::onOldPasswordChange,
                 label = { Text(stringResource(R.string.change_password_old_label)) },
                 modifier = Modifier.fillMaxWidth(),
@@ -93,16 +89,16 @@ fun ChangePasswordScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedTextField(
-                value = newPassword,
+                value = newPassword.value,
                 onValueChange = viewModel::onNewPasswordChange,
                 label = { Text(stringResource(R.string.change_password_new_label)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 visualTransformation = PasswordVisualTransformation(),
-                isError = newPassword.isNotBlank() && newPasswordError != null,
+                isError = newPassword.isTouched && !newPassword.isValid,
                 supportingText = {
-                    if (newPassword.isNotBlank()) {
-                        newPasswordError?.let { Text(stringResource(it), color = MaterialTheme.colorScheme.error) }
+                    if (newPassword.isTouched && newPassword.error != null) {
+                        Text(newPassword.error!!, color = MaterialTheme.colorScheme.error)
                     }
                 }
             )
@@ -110,16 +106,16 @@ fun ChangePasswordScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedTextField(
-                value = confirmPassword,
+                value = confirmPassword.value,
                 onValueChange = viewModel::onConfirmPasswordChange,
                 label = { Text(stringResource(R.string.change_password_confirm_label)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 visualTransformation = PasswordVisualTransformation(),
-                isError = confirmPassword.isNotBlank() && confirmError != null,
+                isError = confirmPassword.isTouched && !confirmPassword.isValid,
                 supportingText = {
-                    if (confirmPassword.isNotBlank()) {
-                        confirmError?.let { Text(stringResource(it), color = MaterialTheme.colorScheme.error) }
+                    if (confirmPassword.isTouched && confirmPassword.error != null) {
+                        Text(confirmPassword.error!!, color = MaterialTheme.colorScheme.error)
                     }
                 }
             )
@@ -131,7 +127,7 @@ fun ChangePasswordScreen(
                     .fillMaxWidth()
                     .height(55.dp),
                 shape = RoundedCornerShape(30.dp),
-                enabled = oldPassword.isNotBlank() && newPasswordError == null && confirmError == null,
+                enabled = viewModel.isFormValid,
                 onClick = {
                     viewModel.changePassword(
                         onSuccess = {

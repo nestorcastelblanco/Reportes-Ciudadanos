@@ -1,4 +1,4 @@
-package com.example.seguimiento1.core.navigation
+package com.example.seguimiento1.core.session
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

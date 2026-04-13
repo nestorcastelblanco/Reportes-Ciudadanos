@@ -11,31 +11,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import com.example.seguimiento1.R
-import com.example.seguimiento1.core.navigation.RecoverPasswordRoute
-import com.example.seguimiento1.core.navigation.RegisterRoute
-import com.example.seguimiento1.core.utils.FieldValidators
 import com.example.seguimiento1.ui.components.AppPrimaryButton
 import com.example.seguimiento1.ui.components.AuthHeader
 
 @Composable
 fun LoginScreen(
-    navController: NavHostController,
-    viewModel: LoginViewModel = hiltViewModel()
-) {
-    LoginScreen(
-        navController = navController,
-        onLoginSuccess = {},
-        viewModel = viewModel
-    )
-}
-
-@Composable
-fun LoginScreen(
-    navController: NavHostController,
+    onNavigateToRegister: () -> Unit,
+    onNavigateToRecoverPassword: () -> Unit,
     onLoginSuccess: (String) -> Unit,
     viewModel: LoginViewModel = hiltViewModel()
 ) {
@@ -45,17 +30,6 @@ fun LoginScreen(
     val email by viewModel.email.collectAsState()
     val password by viewModel.password.collectAsState()
     var passwordVisible by remember { mutableStateOf(false) }
-
-    // NUEVO: Detectar si el usuario tocó el campo
-    var emailTouched by remember { mutableStateOf(false) }
-    var passwordTouched by remember { mutableStateOf(false) }
-
-    // =========================
-    // VALIDACIONES
-    // =========================
-
-    val emailError = FieldValidators.email(email)
-    val passwordError = FieldValidators.password(password)
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -77,23 +51,18 @@ fun LoginScreen(
             // EMAIL
             // =========================
             OutlinedTextField(
-                value = email,
-                onValueChange = {
-                    if (!emailTouched) emailTouched = true
-                    viewModel.onEmailChange(it)
-                },
+                value = email.value,
+                onValueChange = { viewModel.onEmailChange(it) },
                 label = { Text(stringResource(R.string.login_email_label)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                isError = emailTouched && emailError != null,
+                isError = email.isTouched && !email.isValid,
                 supportingText = {
-                    if (emailTouched) {
-                        emailError?.let {
-                            Text(
-                                text = stringResource(it),
-                                color = MaterialTheme.colorScheme.error
-                            )
-                        }
+                    if (email.isTouched && email.error != null) {
+                        Text(
+                            text = email.error!!,
+                            color = MaterialTheme.colorScheme.error
+                        )
                     }
                 }
             )
@@ -104,11 +73,8 @@ fun LoginScreen(
             // PASSWORD
             // =========================
             OutlinedTextField(
-                value = password,
-                onValueChange = {
-                    if (!passwordTouched) passwordTouched = true
-                    viewModel.onPasswordChange(it)
-                },
+                value = password.value,
+                onValueChange = { viewModel.onPasswordChange(it) },
                 label = { Text(stringResource(R.string.login_password_label)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
@@ -116,15 +82,13 @@ fun LoginScreen(
                     VisualTransformation.None
                 else
                     PasswordVisualTransformation(),
-                isError = passwordTouched && passwordError != null,
+                isError = password.isTouched && !password.isValid,
                 supportingText = {
-                    if (passwordTouched) {
-                        passwordError?.let {
-                            Text(
-                                text = stringResource(it),
-                                color = MaterialTheme.colorScheme.error
-                            )
-                        }
+                    if (password.isTouched && password.error != null) {
+                        Text(
+                            text = password.error!!,
+                            color = MaterialTheme.colorScheme.error
+                        )
                     }
                 }
             )
@@ -132,7 +96,7 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             TextButton(
-                onClick = { navController.navigate(RecoverPasswordRoute) },
+                onClick = onNavigateToRecoverPassword,
                 modifier = Modifier.align(Alignment.End)
             ) {
                 Text(stringResource(R.string.login_forgot_password))
@@ -145,14 +109,14 @@ fun LoginScreen(
                 onClick = {
                     scope.launch {
                         when {
-                            emailError != null ->
+                            !email.isValid ->
                                 snackbarHostState.showSnackbar(context.getString(R.string.login_fix_email))
 
-                            passwordError != null ->
+                            !password.isValid ->
                                 snackbarHostState.showSnackbar(context.getString(R.string.login_fix_password))
 
                             viewModel.login() -> {
-                                onLoginSuccess(email)
+                                onLoginSuccess(email.value)
                             }
 
                             else ->
@@ -207,7 +171,7 @@ fun LoginScreen(
                     text = stringResource(R.string.login_register_link),
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.clickable {
-                        navController.navigate(RegisterRoute)
+                        onNavigateToRegister()
                     }
                 )
             }

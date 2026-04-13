@@ -1,7 +1,7 @@
 package com.example.seguimiento1.di
 
-import android.content.Context
-import com.example.seguimiento1.data.datastore.SessionDataStore
+import com.example.seguimiento1.core.utils.ResourceProvider
+import com.example.seguimiento1.core.utils.ResourceProviderImpl
 import com.example.seguimiento1.data.repository.InMemoryAuthRepository
 import com.example.seguimiento1.data.repository.InMemoryCommentRepository
 import com.example.seguimiento1.data.repository.InMemoryNotificationRepository
@@ -12,47 +12,50 @@ import com.example.seguimiento1.domain.repository.CommentRepository
 import com.example.seguimiento1.domain.repository.NotificationRepository
 import com.example.seguimiento1.domain.repository.ReportRepository
 import com.example.seguimiento1.domain.repository.SessionRepository
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object RepositoryModule {
+abstract class RepositoryModule {
 
-    @Provides
+    @Binds
     @Singleton
-    fun provideAuthRepository(): AuthRepository {
-        return InMemoryAuthRepository()
-    }
+    abstract fun bindSessionRepository(impl: SessionRepositoryImpl): SessionRepository
 
-    @Provides
+    @Binds
     @Singleton
-    fun provideSessionRepository(@ApplicationContext context: Context): SessionRepository {
-        return SessionRepositoryImpl(
-            sessionDataStore = SessionDataStore(context)
-        )
-    }
+    abstract fun bindResourceProvider(impl: ResourceProviderImpl): ResourceProvider
 
-    @Provides
-    @Singleton
-    fun provideReportRepository(): ReportRepository {
-        return InMemoryReportRepository()
-    }
+    companion object {
 
-    @Provides
-    @Singleton
-    fun provideCommentRepository(): CommentRepository {
-        return InMemoryCommentRepository()
-    }
+        @Provides
+        @Singleton
+        fun provideAuthRepository(): AuthRepository {
+            return InMemoryAuthRepository()
+        }
 
-    @Provides
-    @Singleton
-    fun provideNotificationRepository(): NotificationRepository {
-        return InMemoryNotificationRepository()
+        @Provides
+        @Singleton
+        fun provideReportRepository(): ReportRepository {
+            return InMemoryReportRepository()
+        }
+
+        @Provides
+        @Singleton
+        fun provideCommentRepository(): CommentRepository {
+            return InMemoryCommentRepository()
+        }
+
+        @Provides
+        @Singleton
+        fun provideNotificationRepository(): NotificationRepository {
+            return InMemoryNotificationRepository()
+        }
     }
 }
 

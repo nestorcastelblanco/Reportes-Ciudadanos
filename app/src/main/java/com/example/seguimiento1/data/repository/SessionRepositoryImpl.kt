@@ -5,8 +5,9 @@ import com.example.seguimiento1.domain.model.SessionInfo
 import com.example.seguimiento1.domain.repository.SessionRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import javax.inject.Inject
 
-class SessionRepositoryImpl(
+class SessionRepositoryImpl @Inject constructor(
     private val sessionDataStore: SessionDataStore
 ) : SessionRepository {
 

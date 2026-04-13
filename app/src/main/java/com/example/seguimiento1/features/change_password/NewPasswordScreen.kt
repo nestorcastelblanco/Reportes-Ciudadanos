@@ -12,33 +12,26 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.seguimiento1.R
-import com.example.seguimiento1.core.navigation.LoginRoute
-import com.example.seguimiento1.core.utils.FieldValidators
 import kotlinx.coroutines.launch
 
 @Composable
 fun NewPasswordScreen(
-    navController: NavHostController
+    onNavigateBack: () -> Unit,
+    onNavigateToLogin: () -> Unit,
+    viewModel: NewPasswordViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
-    var password by remember { mutableStateOf("") }
-    var confirmPassword by remember { mutableStateOf("") }
+    val password by viewModel.password.collectAsState()
+    val confirmPassword by viewModel.confirmPassword.collectAsState()
 
     var passwordVisible by remember { mutableStateOf(false) }
     var confirmVisible by remember { mutableStateOf(false) }
-
-    var passwordTouched by remember { mutableStateOf(false) }
-    var confirmTouched by remember { mutableStateOf(false) }
-
-    // VALIDACIONES
-    val passwordError = FieldValidators.password(password)
-    val confirmError = FieldValidators.confirmPassword(password, confirmPassword)
 
     Scaffold(
         topBar = {
@@ -49,7 +42,7 @@ fun NewPasswordScreen(
                     .padding(horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = { navController.popBackStack() }) {
+                IconButton(onClick = onNavigateBack) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
                 }
 
@@ -81,11 +74,8 @@ fun NewPasswordScreen(
 
             // PASSWORD
             OutlinedTextField(
-                value = password,
-                onValueChange = {
-                    if (!passwordTouched) passwordTouched = true
-                    password = it
-                },
+                value = password.value,
+                onValueChange = { viewModel.onPasswordChange(it) },
                 label = { Text(stringResource(R.string.new_password_label)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
@@ -93,12 +83,10 @@ fun NewPasswordScreen(
                     VisualTransformation.None
                 else
                     PasswordVisualTransformation(),
-                isError = passwordTouched && passwordError != null,
+                isError = password.isTouched && !password.isValid,
                 supportingText = {
-                    if (passwordTouched) {
-                        passwordError?.let {
-                            Text(stringResource(it), color = MaterialTheme.colorScheme.error)
-                        }
+                    if (password.isTouched && password.error != null) {
+                        Text(password.error!!, color = MaterialTheme.colorScheme.error)
                     }
                 }
             )
@@ -107,11 +95,8 @@ fun NewPasswordScreen(
 
             // CONFIRM PASSWORD
             OutlinedTextField(
-                value = confirmPassword,
-                onValueChange = {
-                    if (!confirmTouched) confirmTouched = true
-                    confirmPassword = it
-                },
+                value = confirmPassword.value,
+                onValueChange = { viewModel.onConfirmPasswordChange(it) },
                 label = { Text(stringResource(R.string.new_password_confirm_label)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
@@ -119,12 +104,10 @@ fun NewPasswordScreen(
                     VisualTransformation.None
                 else
                     PasswordVisualTransformation(),
-                isError = confirmTouched && confirmError != null,
+                isError = confirmPassword.isTouched && !confirmPassword.isValid,
                 supportingText = {
-                    if (confirmTouched) {
-                        confirmError?.let {
-                            Text(stringResource(it), color = MaterialTheme.colorScheme.error)
-                        }
+                    if (confirmPassword.isTouched && confirmPassword.error != null) {
+                        Text(confirmPassword.error!!, color = MaterialTheme.colorScheme.error)
                     }
                 }
             )
@@ -136,13 +119,11 @@ fun NewPasswordScreen(
                     .fillMaxWidth()
                     .height(55.dp),
                 shape = RoundedCornerShape(30.dp),
-                enabled = passwordError == null && confirmError == null,
+                enabled = viewModel.isFormValid,
                 onClick = {
                     scope.launch {
                         snackbarHostState.showSnackbar(context.getString(R.string.new_password_updated))
-                        navController.navigate(LoginRoute) {
-                            popUpTo(LoginRoute) { inclusive = true }
-                        }
+                        onNavigateToLogin()
                     }
                 }
             ) {

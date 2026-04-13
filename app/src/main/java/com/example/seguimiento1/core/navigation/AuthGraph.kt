@@ -18,11 +18,38 @@ fun NavGraphBuilder.authGraph(
 ) {
     navigation<AuthGraph>(startDestination = LoginRoute) {
         composable<LoginRoute> {
-            LoginScreen(navController, onLoginSuccess)
+            LoginScreen(
+                onNavigateToRegister = { navController.navigate(RegisterRoute) },
+                onNavigateToRecoverPassword = { navController.navigate(RecoverPasswordRoute) },
+                onLoginSuccess = onLoginSuccess
+            )
         }
-        composable<RegisterRoute> { RegisterScreen(navController) }
-        composable<RecoverPasswordRoute> { RecoverPasswordScreen(navController) }
-        composable<NewPasswordRoute> { NewPasswordScreen(navController) }
+        composable<RegisterRoute> {
+            RegisterScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+        composable<RecoverPasswordRoute> {
+            RecoverPasswordScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToNewPassword = { navController.navigate(NewPasswordRoute) },
+                onNavigateToLogin = {
+                    navController.navigate(LoginRoute) {
+                        popUpTo(LoginRoute) { inclusive = true }
+                    }
+                }
+            )
+        }
+        composable<NewPasswordRoute> {
+            NewPasswordScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToLogin = {
+                    navController.navigate(LoginRoute) {
+                        popUpTo(LoginRoute) { inclusive = true }
+                    }
+                }
+            )
+        }
     }
 }
 
