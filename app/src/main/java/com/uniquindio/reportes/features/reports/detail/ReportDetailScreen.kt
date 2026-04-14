@@ -1,5 +1,6 @@
 package com.uniquindio.reportes.features.reports.detail
 
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,8 +21,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -43,12 +47,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import coil3.compose.AsyncImage
 import com.uniquindio.reportes.R
 import com.uniquindio.reportes.core.utils.DisplayUtils
 import com.uniquindio.reportes.core.utils.TimeUtils
@@ -64,6 +70,8 @@ fun ReportDetailScreen(
     val report by viewModel.report.collectAsState()
     val comments by viewModel.comments.collectAsState()
     val commentText by viewModel.commentText.collectAsState()
+    val currentEmail by viewModel.currentEmail.collectAsState()
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -75,7 +83,17 @@ fun ReportDetailScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { }) {
+                    IconButton(onClick = {
+                        report?.let { r ->
+                            val shareText = context.getString(R.string.report_share_text, r.title, r.address)
+                            val sendIntent = Intent().apply {
+                                action = Intent.ACTION_SEND
+                                putExtra(Intent.EXTRA_TEXT, shareText)
+                                type = "text/plain"
+                            }
+                            context.startActivity(Intent.createChooser(sendIntent, context.getString(R.string.report_share_chooser)))
+                        }
+                    }) {
                         Icon(Icons.Default.Share, contentDescription = null)
                     }
                     if (viewModel.isOwnReport()) {
@@ -105,6 +123,7 @@ fun ReportDetailScreen(
         }
 
         val r = report!!
+        val hasVoted = r.voterEmails.contains(currentEmail)
 
         Column(
             modifier = Modifier
@@ -117,19 +136,30 @@ fun ReportDetailScreen(
             ) {
                 // Image header
                 item {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(200.dp)
-                            .background(MaterialTheme.colorScheme.surfaceVariant),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = r.title,
-                            style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(16.dp)
+                    if (r.imageUrl.isNotBlank()) {
+                        AsyncImage(
+                            model = r.imageUrl,
+                            contentDescription = stringResource(R.string.report_photo_placeholder),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(220.dp),
+                            contentScale = ContentScale.Crop
                         )
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp)
+                                .background(MaterialTheme.colorScheme.surfaceVariant),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = r.title,
+                                style = MaterialTheme.typography.titleLarge,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
                     }
                 }
 
@@ -168,23 +198,34 @@ fun ReportDetailScreen(
 
                 // Importance bar
                 item {
+                    val importanceCapped = r.importance.coerceAtMost(100)
+                    val importanceLabelRes = when {
+                        importanceCapped >= 67 -> R.string.report_importance_high
+                        importanceCapped >= 34 -> R.string.report_importance_medium
+                        else -> R.string.report_importance_low
+                    }
+                    val importanceColor = when {
+                        importanceCapped >= 67 -> Color.Red
+                        importanceCapped >= 34 -> Color(0xFFFF9800)
+                        else -> MaterialTheme.colorScheme.primary
+                    }
                     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
                         LinearProgressIndicator(
-                            progress = { (r.importance.coerceAtMost(100) / 100f) },
+                            progress = { importanceCapped / 100f },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(6.dp)
                                 .clip(RoundedCornerShape(3.dp)),
-                            color = if (r.importance > 50) Color.Red else MaterialTheme.colorScheme.primary,
+                            color = importanceColor,
                         )
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.End
                         ) {
                             Text(
-                                text = stringResource(R.string.report_importance_high, r.importance),
+                                text = stringResource(importanceLabelRes, r.importance),
                                 style = MaterialTheme.typography.labelSmall,
-                                color = if (r.importance > 50) Color.Red else MaterialTheme.colorScheme.primary
+                                color = importanceColor
                             )
                         }
                     }
@@ -193,10 +234,25 @@ fun ReportDetailScreen(
                 // Importance vote
                 item {
                     Row(modifier = Modifier.padding(horizontal = 16.dp)) {
-                        OutlinedButton(onClick = viewModel::toggleImportance) {
-                            Icon(Icons.Default.FavoriteBorder, contentDescription = null, modifier = Modifier.size(18.dp))
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(stringResource(R.string.report_importance_button, r.importance))
+                        if (hasVoted) {
+                            Button(
+                                onClick = viewModel::toggleImportance,
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color.Red,
+                                    contentColor = Color.White
+                                ),
+                                shape = RoundedCornerShape(50)
+                            ) {
+                                Icon(Icons.Default.Favorite, contentDescription = null, modifier = Modifier.size(18.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(stringResource(R.string.report_importance_button, r.importance))
+                            }
+                        } else {
+                            OutlinedButton(onClick = viewModel::toggleImportance) {
+                                Icon(Icons.Default.FavoriteBorder, contentDescription = null, modifier = Modifier.size(18.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(stringResource(R.string.report_importance_button, r.importance))
+                            }
                         }
                     }
                 }

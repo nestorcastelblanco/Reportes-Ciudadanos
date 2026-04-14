@@ -2,18 +2,22 @@ package com.uniquindio.reportes.core.navigation
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.ImportExport
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Map
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -21,7 +25,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -46,11 +52,11 @@ fun AppNavigation() {
     val sessionState by sessionViewModel.sessionState.collectAsState()
 
     val bottomNavItems = listOf(
-        BottomNavItem(R.string.nav_home, Icons.Default.Home, HomeRoute),
-        BottomNavItem(R.string.nav_map, Icons.Default.Place, MapRoute),
+        BottomNavItem(R.string.nav_home, Icons.Default.LocationOn, HomeRoute),
+        BottomNavItem(R.string.nav_map, Icons.Default.Map, MapRoute),
         BottomNavItem(R.string.nav_report, Icons.Default.AddCircle, CreateReportRoute),
-        BottomNavItem(R.string.nav_data, Icons.Default.Info, StatisticsRoute),
-        BottomNavItem(R.string.nav_profile, Icons.Default.AccountCircle, ProfileRoute)
+        BottomNavItem(R.string.nav_data, Icons.Default.ImportExport, StatisticsRoute),
+        BottomNavItem(R.string.nav_profile, Icons.Default.Person, ProfileRoute)
     )
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -94,23 +100,35 @@ fun AppNavigation() {
     Scaffold(
         bottomBar = {
             if (isAuthenticated && showBottomBar) {
-                NavigationBar {
-                    bottomNavItems.forEach { item ->
-                        val selected = currentDest?.hasRoute(item.route::class) == true
-                        NavigationBarItem(
-                            selected = selected,
-                            onClick = {
-                                navController.navigate(item.route) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
+                Surface(
+                    modifier = Modifier
+                        .padding(horizontal = 12.dp, vertical = 10.dp)
+                        .fillMaxWidth(),
+                    shape = RoundedCornerShape(28.dp),
+                    shadowElevation = 8.dp,
+                    color = MaterialTheme.colorScheme.surface
+                ) {
+                    NavigationBar(
+                        containerColor = Color.Transparent,
+                        tonalElevation = 0.dp
+                    ) {
+                        bottomNavItems.forEach { item ->
+                            val selected = currentDest?.hasRoute(item.route::class) == true
+                            NavigationBarItem(
+                                selected = selected,
+                                onClick = {
+                                    navController.navigate(item.route) {
+                                        popUpTo(navController.graph.findStartDestination().id) {
+                                            saveState = true
+                                        }
+                                        launchSingleTop = true
+                                        restoreState = true
                                     }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                            },
-                            icon = { Icon(item.icon, contentDescription = null) },
-                            label = { Text(stringResource(item.label)) }
-                        )
+                                },
+                                icon = { Icon(item.icon, contentDescription = null) },
+                                label = { Text(stringResource(item.label)) }
+                            )
+                        }
                     }
                 }
             }
@@ -139,4 +157,3 @@ fun AppNavigation() {
         }
     }
 }
-

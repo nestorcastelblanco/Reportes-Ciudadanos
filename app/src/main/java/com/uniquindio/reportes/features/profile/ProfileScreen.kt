@@ -15,20 +15,22 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -56,6 +58,8 @@ import com.uniquindio.reportes.R
 import com.uniquindio.reportes.core.utils.TimeUtils
 import com.uniquindio.reportes.domain.model.UserLevel
 
+private val AvatarColor = Color(0xFF2D3B6B)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
@@ -70,9 +74,7 @@ fun ProfileScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.profile_title)) }
-            )
+            TopAppBar(title = { Text(stringResource(R.string.profile_title)) })
         }
     ) { padding ->
         if (user == null) {
@@ -99,24 +101,25 @@ fun ProfileScreen(
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
             // Avatar
             Box(
                 modifier = Modifier
-                    .size(100.dp)
+                    .size(96.dp)
                     .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primary),
+                    .background(AvatarColor),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = u.initials,
                     style = MaterialTheme.typography.headlineLarge,
-                    color = Color.White
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold
                 )
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
             Text(u.nombre, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
             Text(
@@ -125,14 +128,16 @@ fun ProfileScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             // Level card
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                shape = RoundedCornerShape(12.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
             ) {
                 Row(
                     modifier = Modifier
@@ -140,22 +145,36 @@ fun ProfileScreen(
                         .padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        Icons.Default.CheckCircle,
-                        contentDescription = null,
-                        modifier = Modifier.size(40.dp),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
+                    // Dark circle with white checkmark
+                    Box(
+                        modifier = Modifier
+                            .size(42.dp)
+                            .clip(CircleShape)
+                            .background(AvatarColor),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            Icons.Default.Check,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
                     Spacer(modifier = Modifier.width(12.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text(stringResource(u.level.displayNameRes), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                            Text(
+                                stringResource(u.level.displayNameRes),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
                             Text(
                                 stringResource(R.string.profile_points, u.points, nextLevelMax),
-                                style = MaterialTheme.typography.bodySmall
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                         if (nextLevel != null) {
@@ -168,7 +187,8 @@ fun ProfileScreen(
                         Spacer(modifier = Modifier.height(8.dp))
                         LinearProgressIndicator(
                             progress = { progress },
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
+                            color = AvatarColor
                         )
                     }
                 }
@@ -183,7 +203,8 @@ fun ProfileScreen(
                     onValueChange = {},
                     readOnly = true,
                     label = { Text(stringResource(R.string.profile_email_label)) },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(8.dp)
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
@@ -191,7 +212,8 @@ fun ProfileScreen(
                     onValueChange = {},
                     readOnly = true,
                     label = { Text(stringResource(R.string.profile_phone_label)) },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(8.dp)
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
@@ -199,42 +221,51 @@ fun ProfileScreen(
                     onValueChange = {},
                     readOnly = true,
                     label = { Text(stringResource(R.string.profile_city_label)) },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(8.dp)
                 )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Menu items
+            // Main menu card
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                shape = RoundedCornerShape(12.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
             ) {
-                ProfileMenuItem(stringResource(R.string.profile_my_reports), Icons.Default.Edit, onClick = onMyReports)
+                ProfileMenuItem(stringResource(R.string.profile_my_reports), Icons.Default.FolderOpen, onClick = onMyReports)
+                HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
                 ProfileMenuItem(stringResource(R.string.profile_change_password), Icons.Default.Settings, onClick = onChangePassword)
-                ProfileMenuItem(stringResource(R.string.profile_reputation), Icons.Default.Person, onClick = onReputation)
+                HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
+                ProfileMenuItem(stringResource(R.string.profile_reputation), Icons.Default.EmojiEvents, onClick = onReputation)
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
+            // Session card
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                shape = RoundedCornerShape(12.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
             ) {
                 ProfileMenuItem(stringResource(R.string.profile_logout), Icons.AutoMirrored.Filled.ExitToApp, onClick = onLogout)
+                HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
                 ProfileMenuItem(
                     stringResource(R.string.profile_delete_account),
                     Icons.Default.Delete,
                     onClick = { showDeleteDialog = true },
-                    textColor = Color.Red
+                    textColor = Color(0xFFD32F2F)
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(32.dp))
         }
 
         if (showDeleteDialog) {
@@ -247,7 +278,7 @@ fun ProfileScreen(
                         viewModel.deleteAccount { onLogout() }
                         showDeleteDialog = false
                     }) {
-                        Text(stringResource(R.string.profile_delete_confirm), color = Color.Red)
+                        Text(stringResource(R.string.profile_delete_confirm), color = Color(0xFFD32F2F))
                     }
                 },
                 dismissButton = {
@@ -274,9 +305,24 @@ private fun ProfileMenuItem(
             .padding(horizontal = 16.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(icon, contentDescription = null, tint = if (textColor != Color.Unspecified) textColor else MaterialTheme.colorScheme.onSurfaceVariant)
-        Spacer(modifier = Modifier.width(12.dp))
-        Text(text, style = MaterialTheme.typography.bodyLarge, color = textColor, modifier = Modifier.weight(1f))
-        Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+        Icon(
+            icon,
+            contentDescription = null,
+            tint = if (textColor != Color.Unspecified) textColor else MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(22.dp)
+        )
+        Spacer(modifier = Modifier.width(14.dp))
+        Text(
+            text,
+            style = MaterialTheme.typography.bodyLarge,
+            color = textColor,
+            modifier = Modifier.weight(1f)
+        )
+        Icon(
+            Icons.AutoMirrored.Filled.KeyboardArrowRight,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(20.dp)
+        )
     }
 }

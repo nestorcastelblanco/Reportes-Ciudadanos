@@ -79,7 +79,12 @@
     <string name="report_description_section">Descripción</string>
     <string name="report_location_section">Ubicación</string>
     <string name="report_importance_high">Alta (%1$d)</string>
+    <string name="report_importance_medium">Media (%1$d)</string>
+    <string name="report_importance_low">Baja (%1$d)</string>
     <string name="report_importance_button">Es Importante %1$d</string>
+    <string name="report_importance_voted">Es Importante %1$d</string>
+    <string name="report_share_chooser">Compartir reporte</string>
+    <string name="report_share_text">%1$s\n%2$s\n\nReportado en Reportes Ciudadanos</string>
     <string name="report_comments_title">Comentarios (%1$d)</string>
     <string name="report_comment_hint">Escribe un comentario…</string>
     <string name="report_published_ago">Publicado hace %1$s</string>

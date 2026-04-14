@@ -37,6 +37,8 @@ class InMemoryCommentRepository : CommentRepository {
         )
     )
 
+    override val commentsFlow: Flow<List<Comment>> = comments
+
     override fun commentsForReport(reportId: String): Flow<List<Comment>> {
         return comments.map { list -> list.filter { it.reportId == reportId } }
     }
