@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -7,8 +9,6 @@ plugins {
     alias(libs.plugins.kotlinx.serialization)
 }
 
-import java.util.Properties
-
 val localProperties = Properties().apply {
     val localFile = rootProject.file("local.properties")
     if (localFile.exists()) {
@@ -17,11 +17,11 @@ val localProperties = Properties().apply {
 }
 
 android {
-    namespace = "com.example.seguimiento1"
+    namespace = "com.uniquindio.reportes"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.seguimiento1"
+        applicationId = "com.uniquindio.reportes"
         minSdk = 24
         targetSdk = 36
         versionCode = 1

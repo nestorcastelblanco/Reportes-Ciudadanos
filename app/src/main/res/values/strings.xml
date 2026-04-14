@@ -258,4 +258,57 @@
     <string name="review_verified_success">Reporte verificado</string>
     <string name="review_rejected_success">Reporte rechazado</string>
     <string name="review_resolved_success">Reporte marcado como resuelto</string>
+
+    <!-- User Levels -->
+    <string name="level_novato">Novato</string>
+    <string name="level_colaborador">Colaborador</string>
+    <string name="level_guardian">Guardián</string>
+    <string name="level_heroe_comunitario">Héroe Comunitario</string>
+
+    <!-- Time Ago -->
+    <string name="time_ago_just_now">1 min</string>
+    <string name="time_ago_minutes">%1$d min</string>
+    <string name="time_ago_hours">%1$dh</string>
+    <string name="time_ago_days">%1$dd</string>
+
+    <!-- Month Abbreviations -->
+    <string name="month_jan">Ene</string>
+    <string name="month_feb">Feb</string>
+    <string name="month_mar">Mar</string>
+    <string name="month_apr">Abr</string>
+    <string name="month_may">May</string>
+    <string name="month_jun">Jun</string>
+    <string name="month_jul">Jul</string>
+    <string name="month_aug">Ago</string>
+    <string name="month_sep">Sep</string>
+    <string name="month_oct">Oct</string>
+    <string name="month_nov">Nov</string>
+    <string name="month_dec">Dic</string>
+
+    <!-- Badge Names -->
+    <string name="badge_first_publication">Primera publicación</string>
+    <string name="badge_10_verified">10 verificados</string>
+    <string name="badge_featured_month">Destacado del mes</string>
+    <string name="badge_50_comments">50 comentarios</string>
+    <string name="badge_100_votes">100 votos recibidos</string>
+    <string name="badge_neighborhood_guardian">Guardián del barrio</string>
+    <string name="badge_7_day_streak">Racha de 7 días</string>
+    <string name="badge_total_precision">Precisión total</string>
+    <string name="badge_vigilante">Vigilante</string>
+
+    <!-- Badge Descriptions -->
+    <string name="badge_desc_first_publication">Publica tu primer reporte</string>
+    <string name="badge_desc_10_verified">10 reportes verificados</string>
+    <string name="badge_desc_featured_month">Reporte más votado del mes</string>
+    <string name="badge_desc_50_comments">Deja 50 comentarios</string>
+    <string name="badge_desc_100_votes">Recibe 100 votos</string>
+    <string name="badge_desc_neighborhood_guardian">20 reportes en tu zona</string>
+    <string name="badge_desc_7_day_streak">Reporta 7 días seguidos</string>
+    <string name="badge_desc_total_precision">100% reportes verificados</string>
+    <string name="badge_desc_vigilante">50 reportes publicados</string>
+
+    <!-- Misc -->
+    <string name="badge_star_symbol">★</string>
+    <string name="reputation_points_value">+%1$d</string>
+    <string name="home_default_avatar">U</string>
 </resources>
