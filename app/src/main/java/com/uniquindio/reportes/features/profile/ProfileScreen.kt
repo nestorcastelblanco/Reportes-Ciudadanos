@@ -1,5 +1,8 @@
 package com.uniquindio.reportes.features.profile
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -20,6 +23,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.EmojiEvents
@@ -50,10 +54,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import coil3.compose.AsyncImage
 import com.uniquindio.reportes.R
 import com.uniquindio.reportes.core.utils.TimeUtils
 import com.uniquindio.reportes.domain.model.UserLevel
@@ -71,6 +77,14 @@ fun ProfileScreen(
 ) {
     val user by viewModel.user.collectAsState()
     var showDeleteDialog by remember { mutableStateOf(false) }
+
+    val photoLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        if (uri != null) {
+            viewModel.updateProfilePhoto(uri.toString())
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -105,18 +119,51 @@ fun ProfileScreen(
 
             // Avatar
             Box(
-                modifier = Modifier
-                    .size(96.dp)
-                    .clip(CircleShape)
-                    .background(AvatarColor),
-                contentAlignment = Alignment.Center
+                modifier = Modifier.size(96.dp),
+                contentAlignment = Alignment.BottomEnd
             ) {
-                Text(
-                    text = u.initials,
-                    style = MaterialTheme.typography.headlineLarge,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold
-                )
+                if (!u.profilePhotoUrl.isNullOrBlank()) {
+                    AsyncImage(
+                        model = u.profilePhotoUrl,
+                        contentDescription = stringResource(R.string.profile_change_photo),
+                        modifier = Modifier
+                            .size(96.dp)
+                            .clip(CircleShape)
+                            .clickable { photoLauncher.launch("image/*") },
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .size(96.dp)
+                            .clip(CircleShape)
+                            .background(AvatarColor)
+                            .clickable { photoLauncher.launch("image/*") },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = u.initials,
+                            style = MaterialTheme.typography.headlineLarge,
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+                Box(
+                    modifier = Modifier
+                        .size(28.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primary)
+                        .clickable { photoLauncher.launch("image/*") },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        Icons.Default.CameraAlt,
+                        contentDescription = stringResource(R.string.profile_change_photo),
+                        tint = Color.White,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(14.dp))

@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -55,6 +57,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.compose.AsyncImage
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.rememberCameraPositionState
 import com.uniquindio.reportes.R
 import com.uniquindio.reportes.core.utils.DisplayUtils
 import com.uniquindio.reportes.core.utils.TimeUtils
@@ -134,17 +143,49 @@ fun ReportDetailScreen(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                // Image header
+                // Image header carousel
                 item {
-                    if (r.imageUrl.isNotBlank()) {
-                        AsyncImage(
-                            model = r.imageUrl,
-                            contentDescription = stringResource(R.string.report_photo_placeholder),
+                    if (r.imageUrls.isNotEmpty()) {
+                        val pagerState = rememberPagerState(pageCount = { r.imageUrls.size })
+                        Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(220.dp),
-                            contentScale = ContentScale.Crop
-                        )
+                                .height(220.dp)
+                        ) {
+                            HorizontalPager(
+                                state = pagerState,
+                                modifier = Modifier.fillMaxSize()
+                            ) { page ->
+                                AsyncImage(
+                                    model = r.imageUrls[page],
+                                    contentDescription = stringResource(R.string.report_photo_placeholder),
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop
+                                )
+                            }
+                            if (r.imageUrls.size > 1) {
+                                Row(
+                                    modifier = Modifier
+                                        .align(Alignment.BottomCenter)
+                                        .padding(bottom = 8.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                ) {
+                                    repeat(r.imageUrls.size) { index ->
+                                        Box(
+                                            modifier = Modifier
+                                                .size(if (pagerState.currentPage == index) 10.dp else 8.dp)
+                                                .clip(CircleShape)
+                                                .background(
+                                                    if (pagerState.currentPage == index)
+                                                        MaterialTheme.colorScheme.primary
+                                                    else
+                                                        Color.White.copy(alpha = 0.5f)
+                                                )
+                                        )
+                                    }
+                                }
+                            }
+                        }
                     } else {
                         Box(
                             modifier = Modifier
@@ -270,6 +311,49 @@ fun ReportDetailScreen(
                             text = r.description,
                             style = MaterialTheme.typography.bodyMedium
                         )
+                    }
+                }
+
+                // Location map
+                if (r.latitude != null && r.longitude != null) {
+                    item {
+                        Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                            HorizontalDivider()
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = stringResource(R.string.report_location_section),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            val reportLatLng = LatLng(r.latitude, r.longitude)
+                            val detailCameraState = rememberCameraPositionState {
+                                position = CameraPosition.fromLatLngZoom(reportLatLng, 16f)
+                            }
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(180.dp),
+                                shape = RoundedCornerShape(12.dp)
+                            ) {
+                                GoogleMap(
+                                    modifier = Modifier.fillMaxSize(),
+                                    cameraPositionState = detailCameraState,
+                                    uiSettings = MapUiSettings(
+                                        zoomControlsEnabled = false,
+                                        scrollGesturesEnabled = false,
+                                        zoomGesturesEnabled = false,
+                                        tiltGesturesEnabled = false,
+                                        rotationGesturesEnabled = false
+                                    )
+                                ) {
+                                    Marker(
+                                        state = MarkerState(position = reportLatLng),
+                                        title = r.title
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
 

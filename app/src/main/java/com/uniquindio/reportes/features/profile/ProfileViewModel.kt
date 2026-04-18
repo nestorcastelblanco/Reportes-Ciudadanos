@@ -38,6 +38,15 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
+    fun updateProfilePhoto(photoUri: String) {
+        viewModelScope.launch {
+            val current = _user.value ?: return@launch
+            val updated = current.copy(profilePhotoUrl = photoUri)
+            authRepository.updateUser(updated)
+            _user.value = updated
+        }
+    }
+
     fun deleteAccount(onSuccess: () -> Unit) {
         viewModelScope.launch {
             authRepository.deleteAccount(_email.value)

@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,8 +16,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -82,6 +87,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.resume
 
+private const val MAX_PHOTOS = 5
 private val bogotaCenter = LatLng(4.6097, -74.0817)
 
 private data class AddressSuggestion(
@@ -108,7 +114,7 @@ fun CreateReportScreen(
     var selectedLocation by remember { mutableStateOf<LatLng?>(null) }
     var addressSearchJob by remember { mutableStateOf<Job?>(null) }
 
-    var photoUriString by rememberSaveable { mutableStateOf<String?>(null) }
+    var photoUriStrings by rememberSaveable { mutableStateOf(listOf<String>()) }
     var pendingCameraUri by remember { mutableStateOf<Uri?>(null) }
 
     val cameraPositionState = rememberCameraPositionState {
@@ -116,18 +122,21 @@ fun CreateReportScreen(
     }
 
     val galleryLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri ->
-        if (uri != null) {
-            photoUriString = uri.toString()
+        contract = ActivityResultContracts.GetMultipleContents()
+    ) { uris ->
+        if (uris.isNotEmpty()) {
+            val remaining = MAX_PHOTOS - photoUriStrings.size
+            photoUriStrings = photoUriStrings + uris.take(remaining).map { it.toString() }
         }
     }
 
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
     ) { success ->
-        if (success) {
-            photoUriString = pendingCameraUri?.toString()
+        if (success && photoUriStrings.size < MAX_PHOTOS) {
+            pendingCameraUri?.let { uri ->
+                photoUriStrings = photoUriStrings + uri.toString()
+            }
         }
     }
 
@@ -256,29 +265,79 @@ fun CreateReportScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             // Photos section
-            Text(stringResource(R.string.report_add_photos), style = MaterialTheme.typography.titleSmall)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(stringResource(R.string.report_add_photos), style = MaterialTheme.typography.titleSmall)
+                Text(
+                    text = stringResource(R.string.report_photos_counter, photoUriStrings.size, MAX_PHOTOS),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = if (photoUriStrings.size >= MAX_PHOTOS)
+                        MaterialTheme.colorScheme.error
+                    else
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
             Spacer(modifier = Modifier.height(8.dp))
 
-            if (!photoUriString.isNullOrBlank()) {
-                AsyncImage(
-                    model = photoUriString,
-                    contentDescription = stringResource(R.string.report_photo_placeholder),
+            if (photoUriStrings.isNotEmpty()) {
+                val pagerState = rememberPagerState(pageCount = { photoUriStrings.size })
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(170.dp)
-                        .clip(RoundedCornerShape(12.dp)),
-                    contentScale = ContentScale.Crop
-                )
+                        .height(190.dp)
+                ) {
+                    HorizontalPager(
+                        state = pagerState,
+                        modifier = Modifier.fillMaxSize()
+                    ) { page ->
+                        AsyncImage(
+                            model = photoUriStrings[page],
+                            contentDescription = stringResource(R.string.report_photo_placeholder),
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clip(RoundedCornerShape(12.dp)),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                    // Page indicator
+                    if (photoUriStrings.size > 1) {
+                        Row(
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                                .padding(bottom = 8.dp),
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            repeat(photoUriStrings.size) { index ->
+                                Box(
+                                    modifier = Modifier
+                                        .size(if (pagerState.currentPage == index) 10.dp else 8.dp)
+                                        .clip(CircleShape)
+                                        .background(
+                                            if (pagerState.currentPage == index)
+                                                MaterialTheme.colorScheme.primary
+                                            else
+                                                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+                                        )
+                                )
+                            }
+                        }
+                    }
+                }
                 Spacer(modifier = Modifier.height(8.dp))
             }
 
+            val canAddMore = photoUriStrings.size < MAX_PHOTOS
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 OutlinedButton(
                     onClick = { galleryLauncher.launch("image/*") },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    enabled = canAddMore
                 ) {
                     Icon(Icons.Default.Image, contentDescription = null)
                     Spacer(modifier = Modifier.width(6.dp))
@@ -295,7 +354,8 @@ fun CreateReportScreen(
                         pendingCameraUri = imageUri
                         cameraLauncher.launch(imageUri)
                     },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    enabled = canAddMore
                 ) {
                     Icon(Icons.Default.Videocam, contentDescription = null)
                     Spacer(modifier = Modifier.width(6.dp))
@@ -405,7 +465,7 @@ fun CreateReportScreen(
                         }
                     } else {
                         viewModel.submit(
-                            imageUrl = photoUriString,
+                            imageUrls = photoUriStrings,
                             latitude = selectedLocation?.latitude,
                             longitude = selectedLocation?.longitude,
                             geocode = { addr ->

@@ -92,9 +92,9 @@ fun ReviewReportScreen(
                 .padding(16.dp)
         ) {
             // Image
-            if (r.imageUrl.isNotBlank()) {
+            if (r.imageUrls.isNotEmpty()) {
                 AsyncImage(
-                    model = r.imageUrl,
+                    model = r.imageUrls.first(),
                     contentDescription = stringResource(R.string.report_photo_placeholder),
                     modifier = Modifier
                         .fillMaxWidth()

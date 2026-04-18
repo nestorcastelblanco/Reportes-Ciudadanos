@@ -278,7 +278,7 @@ private fun ReportCard(report: CitizenReport, onClick: () -> Unit) {
             }
 
             // Large image
-            if (report.imageUrl.isBlank()) {
+            if (report.imageUrls.isEmpty()) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -293,7 +293,7 @@ private fun ReportCard(report: CitizenReport, onClick: () -> Unit) {
                 }
             } else {
                 AsyncImage(
-                    model = report.imageUrl,
+                    model = report.imageUrls.first(),
                     contentDescription = report.title,
                     modifier = Modifier
                         .fillMaxWidth()

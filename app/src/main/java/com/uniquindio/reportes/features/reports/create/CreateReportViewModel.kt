@@ -66,7 +66,7 @@ class CreateReportViewModel @Inject constructor(
     }
 
     fun submit(
-        imageUrl: String?,
+        imageUrls: List<String>,
         latitude: Double?,
         longitude: Double?,
         geocode: GeocodeFn,
@@ -90,7 +90,7 @@ class CreateReportViewModel @Inject constructor(
                     category = category.value,
                     reporterEmail = email,
                     reporterName = user?.nombre.orEmpty(),
-                    imageUrl = imageUrl,
+                    imageUrls = imageUrls,
                     latitude = lat,
                     longitude = lng
                 )

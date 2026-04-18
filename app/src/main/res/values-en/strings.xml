@@ -1,0 +1,325 @@
+<resources>
+    <string name="app_name">Citizen Reports</string>
+    <string name="back">Back</string>
+
+    <!-- Bottom Navigation -->
+
+    <!-- Map -->
+    <string name="map_search_hint">Search on the map…</string>
+    <string name="map_categories">Categories</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_map">Map</string>
+    <string name="nav_report">Report</string>
+    <string name="nav_data">Data</string>
+    <string name="nav_profile">Profile</string>
+
+    <!-- Home -->
+    <string name="home_title">Citizen Reports</string>
+    <string name="home_reports_section_title">Recent reports</string>
+    <string name="home_location">Bogotá, Colombia</string>
+    <string name="home_search_hint">Search reports…</string>
+    <string name="home_nearby">Nearby (&lt;1km)</string>
+    <string name="home_report_count">%1$d reports</string>
+    <string name="home_importance">It\'s Important</string>
+    <string name="home_time_ago">%1$s ago</string>
+    <string name="create_report_cta">Create report</string>
+    <string name="logout_button">Log out</string>
+
+    <!-- Categories -->
+    <string name="category_security">Security</string>
+    <string name="category_medical">Medical Emergencies</string>
+    <string name="category_infrastructure">Infrastructure</string>
+    <string name="category_pets">Pets</string>
+    <string name="category_community">Community</string>
+    <string name="category_all">All</string>
+
+    <!-- Status -->
+    <string name="status_pending">Pending</string>
+    <string name="status_verified">Verified</string>
+    <string name="status_rejected">Rejected</string>
+    <string name="status_resolved">Resolved</string>
+
+    <!-- Notifications -->
+    <string name="notifications_title">Notifications</string>
+    <string name="notifications_placeholder">No notifications for now.</string>
+    <string name="notifications_today">TODAY</string>
+    <string name="notifications_yesterday">YESTERDAY</string>
+    <string name="notifications_time_min">%1$d min ago</string>
+    <string name="notifications_time_hours">%1$dh ago</string>
+    <string name="notifications_time_days">%1$dd ago</string>
+
+    <!-- Create Report -->
+    <string name="create_report_title">New Report</string>
+    <string name="create_report_submit">Publish Report</string>
+    <string name="report_title_label">Report Title</string>
+    <string name="report_description_label">Detailed Description</string>
+    <string name="report_address_label">Address</string>
+    <string name="report_category_label">Category</string>
+    <string name="report_snackbar_required_fields">Please fill in all fields</string>
+    <string name="report_snackbar_created">Report created</string>
+    <string name="report_add_photos">Add photos</string>
+    <string name="report_gallery">Gallery</string>
+    <string name="report_camera">Camera</string>
+    <string name="report_location">Location</string>
+    <string name="report_moderator_notice">Your report will be reviewed by a moderator before being published. Please provide accurate information.</string>
+    <string name="report_suggest_category">Suggest category</string>
+    <string name="report_ai_hint">Write your report and the AI will suggest a category.</string>
+    <string name="report_category_suggested">Suggested category: %1$s</string>
+    <string name="report_no_connection_title">No Connection</string>
+    <string name="report_no_connection_msg">No connection. Your report will be saved and published automatically when you regain signal.</string>
+    <string name="report_address_map_hint">Select a suggested address to locate the report on the map.</string>
+    <string name="report_selected_location">Selected location</string>
+
+    <!-- Report Detail -->
+    <string name="report_detail_title">Report Detail</string>
+    <string name="report_not_found">Report not found.</string>
+    <string name="report_address_value">Address: %1$s</string>
+    <string name="report_status_value">Status: %1$s</string>
+    <string name="report_category_value">Category: %1$s</string>
+    <string name="report_description_section">Description</string>
+    <string name="report_location_section">Location</string>
+    <string name="report_importance_high">High (%1$d)</string>
+    <string name="report_importance_medium">Medium (%1$d)</string>
+    <string name="report_importance_low">Low (%1$d)</string>
+    <string name="report_importance_button">It\'s Important %1$d</string>
+    <string name="report_importance_voted">It\'s Important %1$d</string>
+    <string name="report_share_chooser">Share report</string>
+    <string name="report_share_text">%1$s\n%2$s\n\nReported on Citizen Reports</string>
+    <string name="report_comments_title">Comments (%1$d)</string>
+    <string name="report_comment_hint">Write a comment…</string>
+    <string name="report_published_ago">Published %1$s ago</string>
+    <string name="report_importance">importance votes</string>
+    <string name="report_photo_placeholder">📷 Report photo</string>
+
+    <!-- Edit Report -->
+    <string name="edit_report_title">Edit Report</string>
+    <string name="edit_report_save">Save Changes</string>
+    <string name="edit_report_delete">Delete Report</string>
+    <string name="edit_report_resolved">Resolved?</string>
+    <string name="edit_report_saved">Changes saved</string>
+    <string name="edit_report_deleted">Report deleted</string>
+
+    <!-- Validators -->
+    <string name="validator_required_email">Email is required</string>
+    <string name="validator_invalid_email">Invalid email</string>
+    <string name="validator_required_password">Password is required</string>
+    <string name="validator_password_min_length">Minimum 8 characters</string>
+    <string name="validator_password_requires_digit">Must contain at least one number</string>
+    <string name="validator_confirm_password_required">Confirm the password</string>
+    <string name="validator_password_mismatch">Passwords do not match</string>
+
+    <!-- Register Validators -->
+    <string name="register_required_name">Name is required</string>
+    <string name="register_name_min_length">Must have at least 3 characters</string>
+    <string name="register_required_phone">Phone is required</string>
+    <string name="register_phone_min_length">Must have at least 10 digits</string>
+    <string name="register_phone_digits_only">Must contain only numbers</string>
+    <string name="register_required_city">City is required</string>
+    <string name="register_invalid_city">Invalid city name</string>
+
+    <!-- Auth Header -->
+    <string name="auth_header_title">CITY ALERT</string>
+    <string name="auth_header_subtitle">CITIZEN REPORTS</string>
+    <string name="auth_header_caption">Your community, safer</string>
+    <string name="auth_logo_content_description">Logo</string>
+
+    <!-- Login -->
+    <string name="login_email_label">Email</string>
+    <string name="login_password_label">Password</string>
+    <string name="login_forgot_password">Forgot your password?</string>
+    <string name="login_button">Log In</string>
+    <string name="login_fix_email">Fix the email</string>
+    <string name="login_fix_password">Fix the password</string>
+    <string name="login_invalid_credentials">Invalid credentials</string>
+    <string name="login_moderator_button">Log in as moderator</string>
+    <string name="login_moderator_soon">Moderator (coming soon)</string>
+    <string name="login_no_account">Don\'t have an account? </string>
+    <string name="login_register_link">Sign up</string>
+
+    <!-- Register -->
+    <string name="register_title">Create Account</string>
+    <string name="register_subtitle">Join the community and help keep your surroundings safe.</string>
+    <string name="register_name_label">Full Name</string>
+    <string name="register_email_label">Email</string>
+    <string name="register_phone_label">Phone</string>
+    <string name="register_city_label">City</string>
+    <string name="register_password_label">Password</string>
+    <string name="register_confirm_password_label">Confirm Password</string>
+    <string name="register_button">Sign Up</string>
+    <string name="register_fix_fields">Fix the highlighted fields</string>
+    <string name="register_success">Registration successful</string>
+    <string name="register_error">Registration error</string>
+    <string name="register_terms">By signing up, you agree to our Terms of Service and Privacy Policy.</string>
+    <string name="register_have_account">Already have an account? </string>
+    <string name="register_login_link">Log In</string>
+
+    <!-- Recover Password -->
+    <string name="recover_title">Recover Password</string>
+    <string name="recover_question">Can\'t remember your password?</string>
+    <string name="recover_instruction">Enter your email and we\'ll send you a link to set your new password.</string>
+    <string name="recover_email_label">Email</string>
+    <string name="recover_invalid_email">Enter a valid email</string>
+    <string name="recover_link_sent">Link sent</string>
+    <string name="recover_email_not_registered">Email not registered</string>
+    <string name="recover_send_link">Send recovery link</string>
+    <string name="recover_back_to_login">Back to login</string>
+
+    <!-- New Password (Recovery flow) -->
+    <string name="new_password_title">New Password</string>
+    <string name="new_password_subtitle">Create your new password</string>
+    <string name="new_password_label">New password</string>
+    <string name="new_password_confirm_label">Confirm new password</string>
+    <string name="new_password_updated">Password updated</string>
+    <string name="new_password_update_button">Update Password</string>
+
+    <!-- Change Password (logged-in) -->
+    <string name="change_password_title">New Password</string>
+    <string name="change_password_subtitle">Create your new password</string>
+    <string name="change_password_old_label">Old password</string>
+    <string name="change_password_new_label">New password</string>
+    <string name="change_password_confirm_label">Confirm new password</string>
+    <string name="change_password_button">Update Password</string>
+    <string name="change_password_success">Password updated successfully</string>
+    <string name="change_password_wrong_old">The old password is incorrect</string>
+
+    <!-- Profile -->
+    <string name="profile_title">My Profile</string>
+    <string name="profile_member_since">Member since %1$s</string>
+    <string name="profile_next_level">Next level: %1$s</string>
+    <string name="profile_points">%1$d / %2$d pts</string>
+    <string name="profile_email_label">Email</string>
+    <string name="profile_phone_label">Phone</string>
+    <string name="profile_city_label">City</string>
+    <string name="profile_my_reports">My Reports</string>
+    <string name="profile_change_password">Change password</string>
+    <string name="profile_reputation">Reputation and achievements</string>
+    <string name="profile_logout">Log out</string>
+    <string name="profile_delete_account">Delete account</string>
+    <string name="profile_logout_success">Logged out successfully</string>
+    <string name="profile_delete_title">Delete account?</string>
+    <string name="profile_delete_message">This action will permanently delete your account and all your reports. It cannot be undone.</string>
+    <string name="profile_delete_cancel">Cancel</string>
+    <string name="profile_delete_confirm">Yes, delete my account</string>
+
+    <!-- My Reports -->
+    <string name="my_reports_title">My Reports</string>
+    <string name="my_reports_today">TODAY</string>
+    <string name="my_reports_yesterday">YESTERDAY</string>
+    <string name="my_reports_empty">You don\'t have any reports yet.</string>
+
+    <!-- Statistics -->
+    <string name="statistics_title">My Statistics</string>
+    <string name="statistics_active">Active</string>
+    <string name="statistics_finished">Finished</string>
+    <string name="statistics_pending">Pending</string>
+    <string name="statistics_by_category">Reports by category</string>
+    <string name="statistics_monthly_activity">Monthly activity</string>
+    <string name="statistics_total">Total reports: %1$d</string>
+
+    <!-- Reputation -->
+    <string name="reputation_title">Reputation and Achievements</string>
+    <string name="reputation_total_points">Total Points</string>
+    <string name="reputation_level">Level: %1$s</string>
+    <string name="reputation_level_progress">Level progress</string>
+    <string name="reputation_points_to_next">You need %1$d more points to reach level %2$s.</string>
+    <string name="reputation_how_to_earn">How to earn points</string>
+    <string name="reputation_publish_report">Publish a report</string>
+    <string name="reputation_verified_report">Verified report</string>
+    <string name="reputation_importance_vote">Receive an \'It\'s important\' vote</string>
+    <string name="reputation_comment">Comment on a report</string>
+    <string name="reputation_resolved_report">Report marked as resolved</string>
+    <string name="reputation_badges">Badges</string>
+    <string name="reputation_badges_unlocked">%1$d/%2$d unlocked</string>
+
+    <!-- Moderation -->
+    <string name="moderation_title">Moderation Panel</string>
+    <string name="moderation_moderator">Moderator: %1$s</string>
+    <string name="moderation_pending">Pending</string>
+    <string name="moderation_verified">Verified</string>
+    <string name="moderation_rejected">Rejected</string>
+    <string name="moderation_total">Total</string>
+    <string name="moderation_no_reports">No reports in this category.</string>
+    <string name="moderation_logout">Log Out</string>
+    <string name="moderation_verify">Verify</string>
+    <string name="moderation_reject">Reject</string>
+
+    <!-- Review Report -->
+    <string name="review_report_title">Review Report</string>
+    <string name="review_verify">Verify Report</string>
+    <string name="review_reject">Reject Report</string>
+    <string name="review_reject_reason">Rejection reason (optional)</string>
+    <string name="review_reject_hint">Write the reason…</string>
+    <string name="review_mark_resolved">Mark as Resolved</string>
+    <string name="review_reporter_info">Reporter information</string>
+    <string name="review_total_reports">Total reports</string>
+    <string name="review_verified_reports">Verified</string>
+    <string name="review_actions">Moderation actions</string>
+    <string name="review_reporter_history">Reporter history</string>
+    <string name="review_history_total">Total: %1$d</string>
+    <string name="review_history_verified">Verified: %1$d</string>
+    <string name="review_history_rejected">Rejected: %1$d</string>
+    <string name="review_history_pending">Pending: %1$d</string>
+    <string name="review_moderation_actions">Moderation actions</string>
+    <string name="review_verified_success">Report verified</string>
+    <string name="review_rejected_success">Report rejected</string>
+    <string name="review_resolved_success">Report marked as resolved</string>
+
+    <!-- User Levels -->
+    <string name="level_novato">Novice</string>
+    <string name="level_colaborador">Collaborator</string>
+    <string name="level_guardian">Guardian</string>
+    <string name="level_heroe_comunitario">Community Hero</string>
+
+    <!-- Time Ago -->
+    <string name="time_ago_just_now">1 min</string>
+    <string name="time_ago_minutes">%1$d min</string>
+    <string name="time_ago_hours">%1$dh</string>
+    <string name="time_ago_days">%1$dd</string>
+
+    <!-- Month Abbreviations -->
+    <string name="month_jan">Jan</string>
+    <string name="month_feb">Feb</string>
+    <string name="month_mar">Mar</string>
+    <string name="month_apr">Apr</string>
+    <string name="month_may">May</string>
+    <string name="month_jun">Jun</string>
+    <string name="month_jul">Jul</string>
+    <string name="month_aug">Aug</string>
+    <string name="month_sep">Sep</string>
+    <string name="month_oct">Oct</string>
+    <string name="month_nov">Nov</string>
+    <string name="month_dec">Dec</string>
+
+    <!-- Badge Names -->
+    <string name="badge_first_publication">First publication</string>
+    <string name="badge_10_verified">10 verified</string>
+    <string name="badge_featured_month">Featured of the month</string>
+    <string name="badge_50_comments">50 comments</string>
+    <string name="badge_100_votes">100 votes received</string>
+    <string name="badge_neighborhood_guardian">Neighborhood guardian</string>
+    <string name="badge_7_day_streak">7-day streak</string>
+    <string name="badge_total_precision">Total precision</string>
+    <string name="badge_vigilante">Vigilante</string>
+
+    <!-- Badge Descriptions -->
+    <string name="badge_desc_first_publication">Publish your first report</string>
+    <string name="badge_desc_10_verified">10 verified reports</string>
+    <string name="badge_desc_featured_month">Most voted report of the month</string>
+    <string name="badge_desc_50_comments">Leave 50 comments</string>
+    <string name="badge_desc_100_votes">Receive 100 votes</string>
+    <string name="badge_desc_neighborhood_guardian">20 reports in your area</string>
+    <string name="badge_desc_7_day_streak">Report 7 days in a row</string>
+    <string name="badge_desc_total_precision">100% verified reports</string>
+    <string name="badge_desc_vigilante">50 published reports</string>
+
+    <!-- Misc -->
+    <string name="badge_star_symbol">★</string>
+    <string name="reputation_points_value">+%1$d</string>
+    <string name="home_default_avatar">U</string>
+    <string name="profile_change_photo">Change profile photo</string>
+    <string name="report_photos_count">%1$d of %2$d</string>
+    <string name="report_photos_counter">%1$d / %2$d photos</string>
+    <string name="report_photos_max">Maximum photos reached</string>
+    <string name="map_filter_categories">Filter by category</string>
+</resources>
+

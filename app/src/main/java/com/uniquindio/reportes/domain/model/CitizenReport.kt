@@ -7,7 +7,7 @@ data class CitizenReport(
     val address: String,
     val category: ReportCategory,
     val status: ReportStatus,
-    val imageUrl: String,
+    val imageUrls: List<String> = emptyList(),
     val reporterEmail: String,
     val reporterName: String = "",
     val createdAtMillis: Long,

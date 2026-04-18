@@ -30,7 +30,8 @@ data class User(
     val ciudad: String,
     val role: UserRole = UserRole.USER,
     val joinDateMillis: Long = System.currentTimeMillis(),
-    val points: Int = 0
+    val points: Int = 0,
+    val profilePhotoUrl: String? = null
 ) {
     val level: UserLevel
         get() = UserLevel.entries.last { points >= it.minPoints }

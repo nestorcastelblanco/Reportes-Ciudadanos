@@ -5,18 +5,30 @@ import android.location.Geocoder
 import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+
+
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Pets
@@ -33,9 +45,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
@@ -47,6 +63,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.uniquindio.reportes.R
+import com.uniquindio.reportes.core.utils.DisplayUtils.categoryStringRes
 import com.uniquindio.reportes.domain.model.ReportCategory
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
@@ -101,6 +118,8 @@ fun MapScreen(
     val scope = rememberCoroutineScope()
     val reports by viewModel.reports.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
+    val selectedCategory by viewModel.selectedCategory.collectAsState()
+    var showCategoryFilter by remember { mutableStateOf(false) }
 
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(bogotaCenter, 14f)
@@ -193,6 +212,74 @@ fun MapScreen(
             containerColor = MaterialTheme.colorScheme.surface
         ) {
             Icon(Icons.Default.LocationOn, contentDescription = null)
+        }
+
+        // Category filter FAB
+        FloatingActionButton(
+            onClick = { showCategoryFilter = !showCategoryFilter },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(end = 16.dp, bottom = 80.dp),
+            containerColor = if (selectedCategory != null)
+                categoryMarkerColor(selectedCategory!!)
+            else
+                MaterialTheme.colorScheme.surface
+        ) {
+            Icon(
+                Icons.Default.FilterList,
+                contentDescription = stringResource(R.string.map_filter_categories),
+                tint = if (selectedCategory != null) Color.White
+                       else MaterialTheme.colorScheme.onSurface
+            )
+        }
+
+        // Category filter panel
+        if (showCategoryFilter) {
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(end = 16.dp, bottom = 144.dp)
+                    .background(
+                        MaterialTheme.colorScheme.surface,
+                        RoundedCornerShape(16.dp)
+                    )
+                    .border(1.dp, Color.Gray.copy(alpha = 0.3f), RoundedCornerShape(16.dp))
+                    .padding(8.dp)
+                    .width(160.dp)
+            ) {
+                ReportCategory.entries.forEach { cat ->
+                    val isSelected = selectedCategory == cat
+                    val color = categoryMarkerColor(cat)
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(
+                                if (isSelected) color.copy(alpha = 0.15f) else Color.Transparent
+                            )
+                            .clickable {
+                                viewModel.onCategoryFilter(cat)
+                                showCategoryFilter = false
+                            }
+                            .padding(horizontal = 12.dp, vertical = 10.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            categoryMarkerIcon(cat),
+                            contentDescription = null,
+                            tint = color,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            stringResource(categoryStringRes(cat)),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = if (isSelected) color else MaterialTheme.colorScheme.onSurface,
+                            maxLines = 1
+                        )
+                    }
+                }
+            }
         }
     }
 }

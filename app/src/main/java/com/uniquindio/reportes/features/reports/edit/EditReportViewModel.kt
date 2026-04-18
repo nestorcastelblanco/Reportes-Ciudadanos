@@ -39,6 +39,9 @@ class EditReportViewModel @Inject constructor(
     private val _category = MutableStateFlow(ReportCategory.SECURITY)
     val category: StateFlow<ReportCategory> = _category.asStateFlow()
 
+    private val _imageUrls = MutableStateFlow<List<String>>(emptyList())
+    val imageUrls: StateFlow<List<String>> = _imageUrls.asStateFlow()
+
     init {
         viewModelScope.launch {
             val r = reportRepository.reportById(reportId).first()
@@ -47,6 +50,7 @@ class EditReportViewModel @Inject constructor(
                 _title.value = it.title
                 _description.value = it.description
                 _category.value = it.category
+                _imageUrls.value = it.imageUrls
             }
         }
     }
@@ -54,12 +58,19 @@ class EditReportViewModel @Inject constructor(
     fun onTitleChange(v: String) { _title.value = v }
     fun onDescriptionChange(v: String) { _description.value = v }
     fun onCategoryChange(v: ReportCategory) { _category.value = v }
+    fun addImages(uris: List<String>) { _imageUrls.value = _imageUrls.value + uris }
+    fun removeImage(index: Int) { _imageUrls.value = _imageUrls.value.toMutableList().apply { removeAt(index) } }
 
     fun save(onSuccess: () -> Unit) {
         viewModelScope.launch {
             val r = _report.value ?: return@launch
             reportRepository.updateReport(
-                r.copy(title = _title.value, description = _description.value, category = _category.value)
+                r.copy(
+                    title = _title.value,
+                    description = _description.value,
+                    category = _category.value,
+                    imageUrls = _imageUrls.value
+                )
             )
             onSuccess()
         }

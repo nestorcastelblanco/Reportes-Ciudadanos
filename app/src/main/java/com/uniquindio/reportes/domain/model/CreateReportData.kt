@@ -7,7 +7,7 @@ data class CreateReportData(
     val category: ReportCategory,
     val reporterEmail: String,
     val reporterName: String = "",
-    val imageUrl: String? = null,
+    val imageUrls: List<String> = emptyList(),
     val latitude: Double? = null,
     val longitude: Double? = null
 )

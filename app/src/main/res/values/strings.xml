@@ -316,4 +316,9 @@
     <string name="badge_star_symbol">★</string>
     <string name="reputation_points_value">+%1$d</string>
     <string name="home_default_avatar">U</string>
+    <string name="profile_change_photo">Cambiar foto de perfil</string>
+    <string name="report_photos_count">%1$d de %2$d</string>
+    <string name="report_photos_counter">%1$d / %2$d fotos</string>
+    <string name="report_photos_max">Máximo de fotos alcanzado</string>
+    <string name="map_filter_categories">Filtrar por categoría</string>
 </resources>
