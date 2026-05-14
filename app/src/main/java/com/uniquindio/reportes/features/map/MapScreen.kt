@@ -42,13 +42,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import android.Manifest
+import android.content.pm.PackageManager
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.core.content.ContextCompat
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -119,10 +123,29 @@ fun MapScreen(
     val reports by viewModel.reports.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
     val selectedCategory by viewModel.selectedCategory.collectAsState()
+    val userLocation by viewModel.userLocation.collectAsState()
     var showCategoryFilter by remember { mutableStateOf(false) }
 
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(bogotaCenter, 14f)
+    }
+
+    val hasLocationPermission = remember {
+        ContextCompat.checkSelfPermission(
+            context, Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED ||
+            ContextCompat.checkSelfPermission(
+                context, Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    LaunchedEffect(userLocation) {
+        userLocation?.let {
+            cameraPositionState.animate(
+                CameraUpdateFactory.newLatLngZoom(LatLng(it.latitude, it.longitude), 15f),
+                durationMs = 800
+            )
+        }
     }
 
     val searchLocation: () -> Unit = {
@@ -143,7 +166,7 @@ fun MapScreen(
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
-            properties = MapProperties(),
+            properties = MapProperties(isMyLocationEnabled = hasLocationPermission),
             uiSettings = MapUiSettings(zoomControlsEnabled = false, myLocationButtonEnabled = false)
         ) {
             reports.forEach { report ->
@@ -199,12 +222,15 @@ fun MapScreen(
         // Location FAB
         FloatingActionButton(
             onClick = {
+                val target = userLocation?.let { LatLng(it.latitude, it.longitude) } ?: bogotaCenter
+                val zoom = if (userLocation != null) 15f else 14f
                 scope.launch {
                     cameraPositionState.animate(
-                        CameraUpdateFactory.newLatLngZoom(bogotaCenter, 14f),
+                        CameraUpdateFactory.newLatLngZoom(target, zoom),
                         durationMs = 600
                     )
                 }
+                viewModel.refreshUserLocation()
             },
             modifier = Modifier
                 .align(Alignment.BottomEnd)

@@ -30,10 +30,12 @@ import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -69,6 +71,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import com.uniquindio.reportes.R
 import com.uniquindio.reportes.core.utils.DisplayUtils.categoryStringRes
+import com.uniquindio.reportes.data.location.reverseGeocode
 import com.uniquindio.reportes.domain.model.ReportCategory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -108,6 +111,9 @@ fun CreateReportScreen(
     val description by viewModel.description.collectAsState()
     val address by viewModel.address.collectAsState()
     val category by viewModel.category.collectAsState()
+    val isUploading by viewModel.isUploading.collectAsState()
+    val isClassifying by viewModel.isClassifying.collectAsState()
+    val userLocation by viewModel.userLocation.collectAsState()
     var categoryExpanded by remember { mutableStateOf(false) }
     var addressExpanded by remember { mutableStateOf(false) }
     var addressSuggestions by remember { mutableStateOf(emptyList<AddressSuggestion>()) }
@@ -143,6 +149,16 @@ fun CreateReportScreen(
     LaunchedEffect(selectedLocation) {
         selectedLocation?.let {
             cameraPositionState.position = CameraPosition.fromLatLngZoom(it, 16f)
+        }
+    }
+
+    LaunchedEffect(userLocation) {
+        if (selectedLocation == null) {
+            userLocation?.let {
+                cameraPositionState.position = CameraPosition.fromLatLngZoom(
+                    LatLng(it.latitude, it.longitude), 15f
+                )
+            }
         }
     }
 
@@ -245,19 +261,28 @@ fun CreateReportScreen(
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     OutlinedButton(
+                        enabled = !isClassifying,
                         onClick = {
-                            val suggested = viewModel.suggestCategoryFromText()
-                            scope.launch {
-                                snackbarHostState.showSnackbar(
-                                    message = context.getString(
-                                        R.string.report_category_suggested,
-                                        context.getString(categoryStringRes(suggested))
+                            viewModel.suggestCategoryFromText { suggested ->
+                                scope.launch {
+                                    snackbarHostState.showSnackbar(
+                                        message = context.getString(
+                                            R.string.report_category_suggested,
+                                            context.getString(categoryStringRes(suggested))
+                                        )
                                     )
-                                )
+                                }
                             }
                         }
                     ) {
-                        Text(stringResource(R.string.report_suggest_category))
+                        if (isClassifying) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(16.dp),
+                                strokeWidth = 2.dp
+                            )
+                        } else {
+                            Text(stringResource(R.string.report_suggest_category))
+                        }
                     }
                 }
             }
@@ -416,6 +441,37 @@ fun CreateReportScreen(
             )
 
             Spacer(modifier = Modifier.height(8.dp))
+            OutlinedButton(
+                onClick = {
+                    viewModel.fetchCurrentLocation { location ->
+                        if (location == null) {
+                            scope.launch {
+                                snackbarHostState.showSnackbar(
+                                    context.getString(R.string.report_location_unavailable)
+                                )
+                            }
+                        } else {
+                            val latLng = LatLng(location.latitude, location.longitude)
+                            selectedLocation = latLng
+                            scope.launch {
+                                val result = context.reverseGeocode(location.latitude, location.longitude)
+                                val addressText = result?.fullAddress?.takeIf { it.isNotBlank() }
+                                    ?: "%.5f, %.5f".format(location.latitude, location.longitude)
+                                viewModel.onAddressChange(addressText)
+                                addressExpanded = false
+                                addressSuggestions = emptyList()
+                            }
+                        }
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(Icons.Default.MyLocation, contentDescription = null)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(stringResource(R.string.report_use_my_location))
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Location label + map
             Text(stringResource(R.string.report_location), style = MaterialTheme.typography.titleSmall)
@@ -481,17 +537,28 @@ fun CreateReportScreen(
                         }
                     }
                 },
+                enabled = !isUploading,
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 shape = RoundedCornerShape(25.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary
                 )
             ) {
-                Text(
-                    text = stringResource(R.string.create_report_submit),
-                    style = MaterialTheme.typography.labelLarge,
-                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp)
-                )
+                if (isUploading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .padding(horizontal = 24.dp, vertical = 4.dp)
+                            .size(20.dp),
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                } else {
+                    Text(
+                        text = stringResource(R.string.create_report_submit),
+                        style = MaterialTheme.typography.labelLarge,
+                        modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp)
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))

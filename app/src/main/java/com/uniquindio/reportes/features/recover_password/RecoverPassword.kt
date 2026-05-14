@@ -76,7 +76,7 @@ fun RecoverPasswordScreen(
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Image(
-                        painter = painterResource(id = R.drawable.ic_key_background),
+                        painter = painterResource(id = R.drawable.ic_key_bg_local),
                         contentDescription = null,
                         modifier = Modifier.size(100.dp)
                     )

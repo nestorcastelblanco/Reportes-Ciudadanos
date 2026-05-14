@@ -20,6 +20,12 @@ ksp = "2.3.2"
 # Project-specific (maps)
 mapsCompose = "6.4.1"
 playServicesMaps = "19.1.0"
+playServicesLocation = "21.3.0"
+# Firebase
+firebaseBom = "34.13.0"
+googleServices = "4.4.4"
+coroutinesPlayServices = "1.10.2"
+generativeAi = "0.9.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -49,6 +55,16 @@ data-store = { module = "androidx.datastore:datastore-preferences", version.ref=
 # Project-specific (maps)
 maps-compose = { group = "com.google.maps.android", name = "maps-compose", version.ref = "mapsCompose" }
 play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }
+play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
+# Firebase
+firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
+firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics" }
+firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
+firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
+firebase-storage = { group = "com.google.firebase", name = "firebase-storage" }
+firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging" }
+kotlinx-coroutines-play-services = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-play-services", version.ref = "coroutinesPlayServices" }
+generative-ai = { group = "com.google.ai.client.generativeai", name = "generativeai", version.ref = "generativeAi" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -57,3 +73,4 @@ kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "ko
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 hilt-android = { id="com.google.dagger.hilt.android", version.ref="hiltAndroid"}
 devtools-ksp = { id="com.google.devtools.ksp", version.ref="ksp" }
+google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }

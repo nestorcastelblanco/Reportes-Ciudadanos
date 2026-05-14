@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1044882496701",
+    "project_id": "reportes-ciudadanos-dafff",
+    "storage_bucket": "reportes-ciudadanos-dafff.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1044882496701:android:bca280fc30f36f08422bd4",
+        "android_client_info": {
+          "package_name": "com.uniquindio.reportes"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBsT7xuycCqNRwoAr9mQvNg3alEsCakl40"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

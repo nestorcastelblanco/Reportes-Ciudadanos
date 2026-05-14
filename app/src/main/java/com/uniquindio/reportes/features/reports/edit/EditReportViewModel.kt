@@ -7,6 +7,7 @@ import androidx.navigation.toRoute
 import com.uniquindio.reportes.core.navigation.EditReportRoute
 import com.uniquindio.reportes.domain.model.CitizenReport
 import com.uniquindio.reportes.domain.model.ReportCategory
+import com.uniquindio.reportes.domain.repository.ImageStorageRepository
 import com.uniquindio.reportes.domain.repository.ReportRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -20,7 +21,8 @@ import kotlinx.serialization.SerializationException
 @HiltViewModel
 class EditReportViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val reportRepository: ReportRepository
+    private val reportRepository: ReportRepository,
+    private val imageStorageRepository: ImageStorageRepository
 ) : ViewModel() {
 
     private val reportId: String = try {
@@ -64,12 +66,15 @@ class EditReportViewModel @Inject constructor(
     fun save(onSuccess: () -> Unit) {
         viewModelScope.launch {
             val r = _report.value ?: return@launch
+            val uploadedUrls = runCatching {
+                imageStorageRepository.uploadReportImages(_imageUrls.value, r.reporterEmail)
+            }.getOrDefault(_imageUrls.value)
             reportRepository.updateReport(
                 r.copy(
                     title = _title.value,
                     description = _description.value,
                     category = _category.value,
-                    imageUrls = _imageUrls.value
+                    imageUrls = uploadedUrls
                 )
             )
             onSuccess()

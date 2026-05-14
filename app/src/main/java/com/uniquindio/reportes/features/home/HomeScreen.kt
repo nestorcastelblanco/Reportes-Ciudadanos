@@ -99,6 +99,7 @@ fun HomeScreen(
     val searchQuery by viewModel.searchQuery.collectAsState()
     val selectedCategory by viewModel.selectedCategory.collectAsState()
     val userInitials by viewModel.userInitials.collectAsState()
+    val cityLabel by viewModel.cityLabel.collectAsState()
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
@@ -118,7 +119,7 @@ fun HomeScreen(
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
-                                stringResource(R.string.home_location),
+                                cityLabel.ifBlank { stringResource(R.string.home_location) },
                                 style = MaterialTheme.typography.bodySmall
                             )
                         }
