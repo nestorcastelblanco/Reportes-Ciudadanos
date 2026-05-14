@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.devtools.ksp)
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.google.services)
+    alias(libs.plugins.firebase.appdistribution)
 }
 
 val localProperties = Properties().apply {
@@ -41,11 +42,20 @@ android {
 
     buildTypes {
         release {
+            // Firmado con la keystore de debug para simplificar la distribución
+            // interna vía Firebase App Distribution. Cambiar antes de Play Store.
+            signingConfig = signingConfigs.getByName("debug")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+
+            firebaseAppDistribution {
+                releaseNotes = "Build interno generado desde Gradle."
+                groups = "testers"
+                // serviceCredentialsFile = "$rootDir/firebase-service-account.json"
+            }
         }
     }
     compileOptions {
