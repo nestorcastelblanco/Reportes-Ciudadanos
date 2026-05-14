@@ -115,6 +115,33 @@ class FirebaseAuthRepository @Inject constructor(
         return getUserByEmail(email)?.role ?: UserRole.USER
     }
 
+    override suspend fun listUsers(): List<User> {
+        return runCatching {
+            val snapshot = usersCollection.get().await()
+            snapshot.documents.mapNotNull { doc ->
+                doc.toUser(doc.id)
+            }.sortedBy { it.nombre.ifBlank { it.email } }
+        }.onFailure { e ->
+            Log.e(TAG, "listUsers failed: ${e::class.java.simpleName}: ${e.message}", e)
+        }.getOrDefault(emptyList())
+    }
+
+    override suspend fun setUserRole(email: String, role: UserRole) {
+        runCatching {
+            usersCollection.document(email).update("role", role.name).await()
+        }.onFailure { e ->
+            Log.e(TAG, "setUserRole failed for '$email': ${e::class.java.simpleName}: ${e.message}", e)
+        }
+    }
+
+    override suspend fun setUserActive(email: String, active: Boolean) {
+        runCatching {
+            usersCollection.document(email).update("active", active).await()
+        }.onFailure { e ->
+            Log.e(TAG, "setUserActive failed for '$email': ${e::class.java.simpleName}: ${e.message}", e)
+        }
+    }
+
     override suspend fun addPoints(email: String, points: Int) {
         runCatching {
             usersCollection.document(email)
@@ -133,7 +160,8 @@ class FirebaseAuthRepository @Inject constructor(
         "role" to role.name,
         "joinDateMillis" to joinDateMillis,
         "points" to points,
-        "profilePhotoUrl" to profilePhotoUrl
+        "profilePhotoUrl" to profilePhotoUrl,
+        "active" to active
     )
 
     private fun com.google.firebase.firestore.DocumentSnapshot.toUser(email: String): User {
@@ -146,7 +174,8 @@ class FirebaseAuthRepository @Inject constructor(
             role = runCatching { UserRole.valueOf(roleName) }.getOrDefault(UserRole.USER),
             joinDateMillis = getLong("joinDateMillis") ?: System.currentTimeMillis(),
             points = (getLong("points") ?: 0L).toInt(),
-            profilePhotoUrl = getString("profilePhotoUrl")
+            profilePhotoUrl = getString("profilePhotoUrl"),
+            active = getBoolean("active") ?: true
         )
     }
 

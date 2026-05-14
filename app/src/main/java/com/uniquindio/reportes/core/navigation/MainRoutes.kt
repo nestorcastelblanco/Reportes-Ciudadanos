@@ -57,7 +57,16 @@ data object ReputationRoute
 data object StatisticsRoute
 
 @Serializable
+data object ModeratorDashboardRoute
+
+@Serializable
 data object ModerationPanelRoute
+
+@Serializable
+data object ModeratorUsersRoute
+
+@Serializable
+data class ModeratorUserDetailRoute(val email: String)
 
 @Serializable
 data class ReviewReportRoute(val reportId: String)

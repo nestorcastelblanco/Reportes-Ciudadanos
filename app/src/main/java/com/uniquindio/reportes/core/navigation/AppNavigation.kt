@@ -76,7 +76,7 @@ fun AppNavigation() {
         when (val state = sessionState) {
             is SessionUiState.Authenticated -> {
                 if (state.role == UserRole.MODERATOR) {
-                    navController.navigate(ModerationPanelRoute) {
+                    navController.navigate(ModeratorDashboardRoute) {
                         popUpTo(AuthGraph) { inclusive = true }
                         launchSingleTop = true
                     }

@@ -57,4 +57,8 @@ class ModerationPanelViewModel @Inject constructor(
     fun rejectReport(reportId: String) {
         viewModelScope.launch { reportRepository.rejectReport(reportId) }
     }
+
+    fun markResolved(reportId: String) {
+        viewModelScope.launch { reportRepository.markResolved(reportId) }
+    }
 }

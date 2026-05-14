@@ -3,7 +3,8 @@ package com.uniquindio.reportes.domain.model
 enum class NotificationType {
     NEARBY_REPORT,
     NEW_COMMENT,
-    REPORT_VERIFIED
+    REPORT_VERIFIED,
+    REPORT_REJECTED
 }
 
 data class AppNotification(
@@ -11,5 +12,7 @@ data class AppNotification(
     val type: NotificationType,
     val title: String,
     val message: String,
-    val createdAtMillis: Long
+    val createdAtMillis: Long,
+    val reportId: String? = null,
+    val read: Boolean = false
 )

@@ -8,14 +8,24 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.core.content.ContextCompat
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.uniquindio.reportes.core.navigation.AppNavigation
+import com.uniquindio.reportes.core.preferences.PreferencesViewModel
+import com.uniquindio.reportes.data.notifications.NotificationBootstrap
 import com.uniquindio.reportes.features.notifications.ReportesFcmService
 import com.uniquindio.reportes.ui.theme.ReportesCiudadanosTheme
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var notificationBootstrap: NotificationBootstrap
 
     private val requestNotificationPermission =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { /* sin acción */ }
@@ -29,8 +39,13 @@ class MainActivity : ComponentActivity() {
         ReportesFcmService.ensureChannel(this)
         ensureNotificationPermission()
         ensureLocationPermission()
+        notificationBootstrap.start()
         setContent {
-            ReportesCiudadanosTheme {
+            val prefsViewModel: PreferencesViewModel = hiltViewModel()
+            val darkModePref by prefsViewModel.darkMode.collectAsState()
+            val systemDark = isSystemInDarkTheme()
+            val darkTheme = darkModePref ?: systemDark
+            ReportesCiudadanosTheme(darkTheme = darkTheme) {
                 AppNavigation()
             }
         }

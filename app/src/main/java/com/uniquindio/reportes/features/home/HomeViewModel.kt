@@ -3,6 +3,8 @@ package com.uniquindio.reportes.features.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import android.content.Context
+import com.uniquindio.reportes.core.preferences.AppPreferences
+import com.uniquindio.reportes.core.preferences.SortOption
 import com.uniquindio.reportes.data.location.LocationProvider
 import com.uniquindio.reportes.data.location.UserLocation
 import com.uniquindio.reportes.data.location.reverseGeocode
@@ -35,8 +37,15 @@ class HomeViewModel @Inject constructor(
     private val sessionRepository: SessionRepository,
     private val authRepository: AuthRepository,
     private val locationProvider: LocationProvider,
+    private val preferences: AppPreferences,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
+
+    val radiusKm: StateFlow<Double?> = preferences.radiusKm
+    val sortBy: StateFlow<SortOption> = preferences.sortBy
+    val verifiedOnly: StateFlow<Boolean> = preferences.verifiedOnly
+
+    fun setRadiusKm(value: Double?) = preferences.setRadiusKm(value)
 
     private val _cityLabel = MutableStateFlow("")
     val cityLabel: StateFlow<String> = _cityLabel.asStateFlow()
@@ -65,31 +74,61 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    private val queryCategoryLocation = combine(
+        searchQuery, selectedCategory, _userLocation
+    ) { q, c, l -> Triple(q, c, l) }
+
+    private val prefsCombined = combine(
+        preferences.radiusKm, preferences.sortBy, preferences.verifiedOnly
+    ) { r, s, v -> Triple(r, s, v) }
+
+    private val filters = combine(queryCategoryLocation, prefsCombined) { qcl, prefs ->
+        FilterState(
+            query = qcl.first,
+            category = qcl.second,
+            location = qcl.third,
+            radiusKm = prefs.first,
+            sortBy = prefs.second,
+            verifiedOnly = prefs.third
+        )
+    }
+
     val reports: StateFlow<List<CitizenReport>> = combine(
         reportRepository.reportsFlow,
-        searchQuery,
-        selectedCategory,
-        _userLocation
-    ) { allReports, query, category, location ->
-        val filtered = allReports.filter { report ->
+        filters
+    ) { allReports, f ->
+        val basics = allReports.filter { report ->
             report.status != ReportStatus.REJECTED &&
-                (category == null || report.category == category) &&
-                (query.isBlank() || report.title.contains(query, ignoreCase = true) ||
-                        report.description.contains(query, ignoreCase = true))
+                (f.category == null || report.category == f.category) &&
+                (!f.verifiedOnly || report.status == ReportStatus.VERIFIED) &&
+                (f.query.isBlank() || report.title.contains(f.query, ignoreCase = true) ||
+                        report.description.contains(f.query, ignoreCase = true))
         }
-        if (location != null) {
-            filtered.sortedBy { report ->
-                if (report.latitude != null && report.longitude != null) {
-                    haversineMeters(
-                        location.latitude, location.longitude,
-                        report.latitude, report.longitude
-                    )
-                } else {
-                    Double.MAX_VALUE
-                }
+
+        val withinRadius = if (f.location != null && f.radiusKm != null) {
+            val limit = f.radiusKm * 1000.0
+            basics.filter { r ->
+                if (r.latitude == null || r.longitude == null) return@filter false
+                haversineMeters(
+                    f.location.latitude, f.location.longitude,
+                    r.latitude, r.longitude
+                ) <= limit
             }
-        } else {
-            filtered
+        } else basics
+
+        when (f.sortBy) {
+            SortOption.MAS_RECIENTE -> withinRadius.sortedByDescending { it.createdAtMillis }
+            SortOption.MAS_CERCANO -> if (f.location != null) {
+                withinRadius.sortedBy { r ->
+                    if (r.latitude != null && r.longitude != null) {
+                        haversineMeters(
+                            f.location.latitude, f.location.longitude,
+                            r.latitude, r.longitude
+                        )
+                    } else Double.MAX_VALUE
+                }
+            } else withinRadius
+            SortOption.MAS_RELEVANTE -> withinRadius.sortedByDescending { it.importance }
         }
     }.stateIn(
         scope = viewModelScope,
@@ -116,6 +155,15 @@ class HomeViewModel @Inject constructor(
         }
     }
 }
+
+private data class FilterState(
+    val query: String,
+    val category: ReportCategory?,
+    val location: UserLocation?,
+    val radiusKm: Double?,
+    val sortBy: SortOption,
+    val verifiedOnly: Boolean
+)
 
 private const val EARTH_RADIUS_METERS = 6_371_000.0
 

@@ -3,7 +3,9 @@ package com.uniquindio.reportes.data.repository
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.uniquindio.reportes.data.notifications.FirestoreNotificationStore
 import com.uniquindio.reportes.domain.model.CitizenReport
+import com.uniquindio.reportes.domain.model.NotificationType
 import com.uniquindio.reportes.domain.model.CreateReportData
 import com.uniquindio.reportes.domain.model.ReportCategory
 import com.uniquindio.reportes.domain.model.ReportStatus
@@ -25,7 +27,8 @@ import kotlinx.coroutines.tasks.await
  */
 @Singleton
 class FirestoreReportRepository @Inject constructor(
-    firestore: FirebaseFirestore
+    firestore: FirebaseFirestore,
+    private val notificationStore: FirestoreNotificationStore
 ) : ReportRepository {
 
     private val reportsCollection = firestore.collection(COLLECTION_REPORTS)
@@ -121,15 +124,41 @@ class FirestoreReportRepository @Inject constructor(
     }
 
     override suspend fun verifyReport(reportId: String) {
+        val report = fetchReport(reportId)
         reportsCollection.document(reportId)
             .update("status", ReportStatus.VERIFIED.name)
             .await()
+        report?.let {
+            notificationStore.publish(
+                recipientEmail = it.reporterEmail,
+                type = NotificationType.REPORT_VERIFIED,
+                title = "Reporte aprobado",
+                message = "Tu reporte \"${it.title}\" fue verificado por un moderador.",
+                reportId = it.id
+            )
+        }
     }
 
     override suspend fun rejectReport(reportId: String) {
+        val report = fetchReport(reportId)
         reportsCollection.document(reportId)
             .update("status", ReportStatus.REJECTED.name)
             .await()
+        report?.let {
+            notificationStore.publish(
+                recipientEmail = it.reporterEmail,
+                type = NotificationType.REPORT_REJECTED,
+                title = "Reporte rechazado",
+                message = "Tu reporte \"${it.title}\" fue rechazado por un moderador.",
+                reportId = it.id
+            )
+        }
+    }
+
+    private suspend fun fetchReport(reportId: String): CitizenReport? {
+        return runCatching {
+            reportsCollection.document(reportId).get().await().toReport()
+        }.getOrNull()
     }
 
     override suspend fun markResolved(reportId: String) {

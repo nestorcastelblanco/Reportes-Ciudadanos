@@ -14,5 +14,8 @@ interface AuthRepository {
     suspend fun deleteAccount(email: String): Boolean
     suspend fun getUserRole(email: String): UserRole
     suspend fun addPoints(email: String, points: Int)
+    suspend fun listUsers(): List<User>
+    suspend fun setUserRole(email: String, role: UserRole)
+    suspend fun setUserActive(email: String, active: Boolean)
 }
 

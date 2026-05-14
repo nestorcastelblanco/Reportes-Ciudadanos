@@ -24,11 +24,18 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Switch
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -40,8 +47,12 @@ import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,6 +66,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import com.uniquindio.reportes.R
+import com.uniquindio.reportes.core.preferences.PreferencesViewModel
+import com.uniquindio.reportes.core.preferences.SortOption
 import com.uniquindio.reportes.core.utils.DisplayUtils
 import com.uniquindio.reportes.core.utils.TimeUtils
 import com.uniquindio.reportes.domain.model.CitizenReport
@@ -93,13 +106,25 @@ fun HomeScreen(
     onOpenNotifications: () -> Unit,
     onOpenReportDetail: (String) -> Unit,
     onOpenProfile: () -> Unit,
-    viewModel: HomeViewModel = hiltViewModel()
+    viewModel: HomeViewModel = hiltViewModel(),
+    prefsViewModel: PreferencesViewModel = hiltViewModel()
 ) {
     val reports by viewModel.reports.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
     val selectedCategory by viewModel.selectedCategory.collectAsState()
     val userInitials by viewModel.userInitials.collectAsState()
     val cityLabel by viewModel.cityLabel.collectAsState()
+    val radiusKm by viewModel.radiusKm.collectAsState()
+    val sortBy by prefsViewModel.sortBy.collectAsState()
+    val verifiedOnly by prefsViewModel.verifiedOnly.collectAsState()
+    val darkMode by prefsViewModel.darkMode.collectAsState()
+
+    var showRadiusDialog by remember { mutableStateOf(false) }
+    var showSettingsSheet by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        viewModel.refreshUserLocation()
+    }
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
@@ -166,7 +191,13 @@ fun HomeScreen(
                 placeholder = { Text(stringResource(R.string.home_search_hint)) },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                 trailingIcon = {
-                    Icon(Icons.Default.Settings, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                    IconButton(onClick = { showSettingsSheet = true }) {
+                        Icon(
+                            Icons.Default.Settings,
+                            contentDescription = "Ajustes",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
@@ -201,17 +232,26 @@ fun HomeScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
+                    val nearbyLabel = radiusKm?.let { km ->
+                        if (km < 1.0) "Cercanos (<${(km * 1000).toInt()}m)"
+                        else "Cercanos (<${km.toInt()}km)"
+                    } ?: "Sin límite"
                     SuggestionChip(
-                        onClick = { },
-                        label = { Text(stringResource(R.string.home_nearby), style = MaterialTheme.typography.labelMedium) }
+                        onClick = { showRadiusDialog = true },
+                        label = { Text(nearbyLabel, style = MaterialTheme.typography.labelMedium) }
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Icon(
-                        Icons.Default.Settings,
-                        contentDescription = null,
-                        modifier = Modifier.size(18.dp),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    IconButton(
+                        onClick = { showRadiusDialog = true },
+                        modifier = Modifier.size(24.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.Settings,
+                            contentDescription = "Radio de distancia",
+                            modifier = Modifier.size(18.dp),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
                 Text(
                     stringResource(R.string.home_report_count, reports.size),
@@ -227,6 +267,155 @@ fun HomeScreen(
                     ReportCard(report = report, onClick = { onOpenReportDetail(report.id) })
                 }
             }
+        }
+    }
+
+    if (showRadiusDialog) {
+        RadiusDialog(
+            currentKm = radiusKm,
+            onSelect = {
+                viewModel.setRadiusKm(it)
+                showRadiusDialog = false
+            },
+            onDismiss = { showRadiusDialog = false }
+        )
+    }
+
+    if (showSettingsSheet) {
+        SettingsSheet(
+            darkMode = darkMode,
+            sortBy = sortBy,
+            verifiedOnly = verifiedOnly,
+            onDarkModeChange = prefsViewModel::setDarkMode,
+            onSortByChange = prefsViewModel::setSortBy,
+            onVerifiedOnlyChange = prefsViewModel::setVerifiedOnly,
+            onDismiss = { showSettingsSheet = false }
+        )
+    }
+}
+
+@Composable
+private fun RadiusDialog(
+    currentKm: Double?,
+    onSelect: (Double?) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val options: List<Pair<String, Double?>> = listOf(
+        "<1 km" to 1.0,
+        "<2 km" to 2.0,
+        "<5 km" to 5.0,
+        "<10 km" to 10.0,
+        "Sin límite" to null
+    )
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Radio de distancia") },
+        text = {
+            Column {
+                options.forEach { (label, value) ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onSelect(value) }
+                            .padding(vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
+                            selected = currentKm == value,
+                            onClick = { onSelect(value) }
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(label)
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) { Text("Cerrar") }
+        }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SettingsSheet(
+    darkMode: Boolean?,
+    sortBy: SortOption,
+    verifiedOnly: Boolean,
+    onDarkModeChange: (Boolean?) -> Unit,
+    onSortByChange: (SortOption) -> Unit,
+    onVerifiedOnlyChange: (Boolean) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val sheetState = rememberModalBottomSheetState()
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState
+    ) {
+        Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+            Text(
+                "Ajustes",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(Modifier.height(12.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("Modo oscuro")
+                Switch(
+                    checked = darkMode == true,
+                    onCheckedChange = { onDarkModeChange(if (it) true else false) }
+                )
+            }
+            TextButton(onClick = { onDarkModeChange(null) }) {
+                Text("Usar tema del sistema")
+            }
+
+            Divider(Modifier.padding(vertical = 8.dp))
+
+            Text("Ordenar por", style = MaterialTheme.typography.titleSmall)
+            Spacer(Modifier.height(4.dp))
+            val sortOptions = listOf(
+                SortOption.MAS_RECIENTE to "Más reciente",
+                SortOption.MAS_CERCANO to "Más cercano",
+                SortOption.MAS_RELEVANTE to "Más relevante"
+            )
+            sortOptions.forEach { (opt, label) ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onSortByChange(opt) }
+                        .padding(vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    RadioButton(
+                        selected = sortBy == opt,
+                        onClick = { onSortByChange(opt) }
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Text(label)
+                }
+            }
+
+            Divider(Modifier.padding(vertical = 8.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("Mostrar solo reportes verificados")
+                Switch(
+                    checked = verifiedOnly,
+                    onCheckedChange = onVerifiedOnlyChange
+                )
+            }
+
+            Spacer(Modifier.height(16.dp))
         }
     }
 }

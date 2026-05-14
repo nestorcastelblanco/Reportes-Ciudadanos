@@ -14,9 +14,16 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.uniquindio.reportes.MainActivity
 import com.uniquindio.reportes.R
+import com.uniquindio.reportes.data.notifications.FcmTokenManager
 import com.uniquindio.reportes.data.repository.FcmNotificationRepository
+import com.uniquindio.reportes.domain.repository.SessionRepository
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 /**
  * Servicio que recibe los mensajes de Firebase Cloud Messaging.
@@ -29,6 +36,14 @@ class ReportesFcmService : FirebaseMessagingService() {
 
     @Inject
     lateinit var notificationRepository: FcmNotificationRepository
+
+    @Inject
+    lateinit var tokenManager: FcmTokenManager
+
+    @Inject
+    lateinit var sessionRepository: SessionRepository
+
+    private val ioScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
@@ -46,7 +61,10 @@ class ReportesFcmService : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-        // TODO: enviar token al backend cuando exista el endpoint.
+        ioScope.launch {
+            val email = sessionRepository.sessionFlow.first().email.orEmpty()
+            tokenManager.persist(email, token)
+        }
     }
 
     private fun showSystemNotification(title: String, body: String) {

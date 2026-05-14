@@ -3,7 +3,9 @@ package com.uniquindio.reportes.data.repository
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.uniquindio.reportes.data.notifications.FirestoreNotificationStore
 import com.uniquindio.reportes.domain.model.Comment
+import com.uniquindio.reportes.domain.model.NotificationType
 import com.uniquindio.reportes.domain.repository.CommentRepository
 import java.util.UUID
 import javax.inject.Inject
@@ -19,10 +21,12 @@ import kotlinx.coroutines.tasks.await
  */
 @Singleton
 class FirestoreCommentRepository @Inject constructor(
-    firestore: FirebaseFirestore
+    private val firestore: FirebaseFirestore,
+    private val notificationStore: FirestoreNotificationStore
 ) : CommentRepository {
 
     private val commentsCollection = firestore.collection(COLLECTION_COMMENTS)
+    private val reportsCollection = firestore.collection("reports")
 
     override val commentsFlow: Flow<List<Comment>> = callbackFlow {
         val registration = commentsCollection
@@ -57,6 +61,22 @@ class FirestoreCommentRepository @Inject constructor(
         val id = comment.id.ifBlank { UUID.randomUUID().toString() }
         val finalComment = if (comment.id.isBlank()) comment.copy(id = id) else comment
         commentsCollection.document(id).set(finalComment.toMap()).await()
+
+        // Notificar al autor del reporte (si no es el mismo que comenta).
+        runCatching {
+            val reportDoc = reportsCollection.document(comment.reportId).get().await()
+            val reporterEmail = reportDoc.getString("reporterEmail").orEmpty()
+            val reportTitle = reportDoc.getString("title").orEmpty()
+            if (reporterEmail.isNotBlank() && reporterEmail != comment.authorEmail) {
+                notificationStore.publish(
+                    recipientEmail = reporterEmail,
+                    type = NotificationType.NEW_COMMENT,
+                    title = "Nuevo comentario",
+                    message = "${comment.authorName.ifBlank { comment.authorEmail }} comentó en \"$reportTitle\".",
+                    reportId = comment.reportId
+                )
+            }
+        }
     }
 
     private fun Comment.toMap(): Map<String, Any?> = mapOf(

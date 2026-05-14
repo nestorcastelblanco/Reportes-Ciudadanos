@@ -82,5 +82,17 @@ class InMemoryAuthRepository : AuthRepository {
         val user = users[email] ?: return
         users[email] = user.copy(points = user.points + points)
     }
+
+    override suspend fun listUsers(): List<User> = users.values.sortedBy { it.nombre }
+
+    override suspend fun setUserRole(email: String, role: UserRole) {
+        val user = users[email] ?: return
+        users[email] = user.copy(role = role)
+    }
+
+    override suspend fun setUserActive(email: String, active: Boolean) {
+        val user = users[email] ?: return
+        users[email] = user.copy(active = active)
+    }
 }
 

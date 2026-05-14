@@ -36,5 +36,8 @@ class DataStoreAuthRepository(
     override suspend fun deleteAccount(email: String): Boolean = false
     override suspend fun getUserRole(email: String): UserRole = UserRole.USER
     override suspend fun addPoints(email: String, points: Int) {}
+    override suspend fun listUsers(): List<User> = emptyList()
+    override suspend fun setUserRole(email: String, role: UserRole) {}
+    override suspend fun setUserActive(email: String, active: Boolean) {}
 }
 
